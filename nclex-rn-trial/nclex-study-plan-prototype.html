@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCLEX Study Plan — Trial Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #0b5ea8; --blue-light: #e8f0fb; --bg: #f4f6f9;
+    --border: #e2e7ee; --text: #1a2332; --muted: #6b7a8f;
+    --orange: #e85c0d; --pink: #e0305a; --green: #2e9e6b; --yellow: #f5c518;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+  .trial-banner { background: var(--orange); color: white; display: flex; align-items: center; justify-content: space-between; padding: 10px 28px; font-size: 14px; font-weight: 500; }
+  .trial-banner .left { display: flex; align-items: center; gap: 8px; }
+  .upgrade-btn { background: white; color: var(--orange); border: none; border-radius: 20px; padding: 6px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .shell { display: flex; min-height: calc(100vh - 44px); }
+  .sidebar { width: 230px; flex-shrink: 0; background: white; border-right: 1px solid var(--border); padding: 20px 0; font-size: 13.5px; }
+  .sidebar-logo { padding: 0 18px 18px; font-weight: 700; font-size: 17px; color: var(--blue); }
+  .sidebar-search { margin: 0 12px 16px; display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--muted); border: 1px solid var(--border); }
+  .nav-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; padding: 14px 18px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 18px; font-size: 13.5px; color: var(--text); cursor: pointer; }
+  .nav-item:hover { background: var(--bg); }
+  .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; border-left: 3px solid var(--blue); }
+  .nav-icon { width: 15px; height: 15px; opacity: 0.55; flex-shrink: 0; }
+  .sidebar-footer { padding: 14px 12px 0; border-top: 1px solid var(--border); margin-top: 12px; }
+  .get-access { display: flex; align-items: center; gap: 8px; background: #fff0f0; border: none; border-radius: 10px; padding: 10px 14px; width: 100%; font-family: inherit; font-weight: 600; font-size: 13.5px; color: #c0392b; cursor: pointer; }
+  .main { flex: 1; overflow: auto; }
+  .hero { background: #f9f5e8; padding: 52px 56px 44px; position: relative; overflow: hidden; }
+  .hero-blob { position: absolute; right: 0; top: 0; width: 420px; height: 300px; background: var(--yellow); border-radius: 0 0 0 60%; opacity: 0.45; pointer-events: none; }
+  .hero-blob2 { position: absolute; right: 80px; bottom: -40px; width: 280px; height: 200px; background: var(--yellow); border-radius: 50%; opacity: 0.25; pointer-events: none; }
+  .hero h1 { font-size: 52px; font-weight: 800; line-height: 1.05; margin-bottom: 12px; letter-spacing: -1px; position: relative; z-index: 1; }
+  .hero h1 em { font-style: normal; font-weight: 400; }
+  .hero p { font-size: 16px; color: #4a5568; max-width: 480px; line-height: 1.6; margin-bottom: 20px; position: relative; z-index: 1; }
+  .trial-callout { display: inline-flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13.5px; color: var(--muted); position: relative; z-index: 1; }
+  .trial-callout a { color: var(--blue); font-weight: 600; text-decoration: none; }
+  .plan-area { padding: 40px 56px; display: grid; grid-template-columns: 1fr 360px; gap: 32px; }
+  .col-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+  .topic-card { border-radius: 14px; padding: 20px 22px; margin-bottom: 12px; display: flex; align-items: center; gap: 18px; }
+  .topic-card.locked { background: #f0f2f5; border: 1px solid var(--border); opacity: 0.7; }
+  .topic-progress { width: 52px; height: 52px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .topic-card.locked .topic-progress { border-color: var(--border); color: var(--muted); }
+  .topic-info { flex: 1; }
+  .topic-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .topic-card.locked .topic-name { color: #9aa5b4; }
+  .locked-label { font-size: 12.5px; color: #9aa5b4; display: flex; align-items: center; gap: 5px; }
+  .schedule-col { }
+  .schedule-header .col-title { margin-bottom: 4px; }
+  .schedule-updated { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .timeline { position: relative; padding-left: 60px; }
+  .timeline::before { content: ''; position: absolute; left: 28px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .day-row { position: relative; margin-bottom: 22px; }
+  .day-badge { position: absolute; left: -60px; top: 0; background: white; border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .day-badge.done { background: var(--green); border-color: var(--green); color: white; }
+  .day-dot { position: absolute; left: -33px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--border); border: 2px solid white; }
+  .day-dot.done { background: var(--green); }
+  .day-task { display: flex; align-items: center; gap: 10px; font-size: 13.5px; margin-bottom: 6px; }
+  .day-task.locked { color: #b0bac6; }
+  .check { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border); flex-shrink: 0; }
+  .check.done { background: var(--green); border-color: var(--green); display: flex; align-items: center; justify-content: center; }
+  .check.done::after { content: '✓'; color: white; font-size: 10px; font-weight: 700; }
+  .day-sub { font-size: 12px; color: var(--muted); margin-left: 26px; margin-bottom: 4px; }
+  .day-row.locked-day .day-badge { background: #f0f2f5; color: #b0bac6; border-color: var(--border); }
+  .day-row.locked-day .day-content { opacity: 0.4; }
+  .schedule-note { font-size: 12.5px; color: var(--muted); background: var(--blue-light); border-radius: 8px; padding: 10px 14px; margin-top: 8px; line-height: 1.5; }
+  .assessment-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .trophy { font-size: 20px; }
+  .assessment-label { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .upgrade-section { padding: 0 56px 56px; text-align: center; }
+  .upgrade-context { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .unlock-plan-btn { background: var(--pink); color: white; border: none; border-radius: 50px; padding: 16px 40px; font-family: inherit; font-weight: 700; font-size: 16px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="trial-banner">
+  <div class="left">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Your Free Trial expires in 5 days.
+  </div>
+  <button class="upgrade-btn">UPGRADE NOW</button>
+</div>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo">SimpleNursing</div>
+    <div class="sidebar-search">
+      <svg class="nav-icon" style="opacity:0.4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search all content
+    </div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</div>
+    <div class="nav-label">Practice</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>NCLEX Question Bank</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>NCLEX Readiness Assessments</div>
+    <div class="nav-label">Learn</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>NCLEX Lecture Series</div>
+    <div class="nav-item active"><svg class="nav-icon" style="opacity:1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>NCLEX Study Plan</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>NCLEX Cram Sessions</div>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:10px;"><div class="nav-item">Support</div><div class="nav-item">Settings</div><div class="nav-item">Logout</div></div>
+    <div class="sidebar-footer"><button class="get-access">❤️ Get full access</button></div>
+  </nav>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-blob"></div>
+      <div class="hero-blob2"></div>
+      <h1><em>Personalized</em><br><strong>Study Plan</strong></h1>
+      <p>Eliminate your anxiety by removing the guesswork from your study plan.</p>
+      <div class="trial-callout">🔒 This is a preview. <a href="#">Unlock your full personalized plan</a> with a membership.</div>
+    </div>
+
+    <div class="plan-area">
+      <div>
+        <div class="col-title">NCLEX Client Needs to review</div>
+        <div class="topic-card locked"><div class="topic-progress">🔒</div><div class="topic-info"><div class="topic-name">Basic Care and Comfort</div><div class="locked-label">🔒 Upgrade to access</div></div></div>
+        <div class="topic-card locked"><div class="topic-progress">🔒</div><div class="topic-info"><div class="topic-name">Health Promotion and Maintenance</div><div class="locked-label">🔒 Upgrade to access</div></div></div>
+        <div class="topic-card locked"><div class="topic-progress">🔒</div><div class="topic-info"><div class="topic-name">Management of Care</div><div class="locked-label">🔒 Upgrade to access</div></div></div>
+        <div class="topic-card locked" style="opacity:0.4"><div class="topic-progress">🔒</div><div class="topic-info"><div class="topic-name" style="color:#b0bac6">+ more topics based on your Readiness Assessment</div></div></div>
+      </div>
+      <div class="schedule-col">
+        <div class="schedule-header"><div class="col-title">Schedule</div><div class="schedule-updated">Your full plan runs 14 days and adapts based on your Readiness Assessment results.</div></div>
+        <div class="timeline">
+          <div class="day-row"><div class="day-badge done">Day 1</div><div class="day-dot done"></div><div class="day-content"><div class="day-task"><div class="check done"></div> Study Plan created</div></div></div>
+          <div class="day-row"><div class="day-badge">Day 2</div><div class="day-dot"></div><div class="day-content"><div class="day-sub">(1/4)</div><div class="day-task locked"><div class="check"></div> Take a 75-question test</div></div></div>
+          <div class="day-row"><div class="day-badge">Day 3</div><div class="day-dot"></div><div class="day-content"><div class="day-sub">(2/4)</div><div class="day-task locked"><div class="check"></div> Take a 75-question test</div></div></div>
+          <div class="day-row locked-day"><div class="day-badge">Day 4</div><div class="day-dot"></div><div class="day-content"><div class="day-sub">(3/4)</div><div class="day-task locked"><div class="check"></div> Take a 75-question test</div></div></div>
+          <div class="day-row locked-day"><div class="day-badge">Day 5–13</div><div class="day-dot"></div><div class="day-content"><div class="day-task locked"><div class="check"></div> Daily practice &amp; review</div></div></div>
+          <div class="day-row locked-day"><div class="day-badge">Day 14</div><div class="day-dot"></div><div class="day-content"><div class="assessment-row"><span class="trophy">🏆</span><span class="assessment-label">Assessment Exam</span></div></div></div>
+        </div>
+        <div class="schedule-note">Your plan is built from your Readiness Assessment results or self-selected topics.</div>
+      </div>
+    </div>
+
+    <div class="upgrade-section">
+      <div class="upgrade-context">Upgrade to unlock your full personalized 14-day plan.</div>
+      <button class="unlock-plan-btn">Unlock your personalized plan</button>
+    </div>
+  </main>
+</div>
+</body>
+</html>

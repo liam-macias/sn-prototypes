@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCLEX Lecture Series — Trial Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #0b5ea8; --blue-light: #e8f0fb; --bg: #f4f6f9;
+    --border: #e2e7ee; --text: #1a2332; --muted: #6b7a8f;
+    --orange: #e85c0d; --pink: #e0305a; --dark: #111418;
+    --dark2: #1c2128; --dark3: #252c35; --green: #2e9e6b;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+  .trial-banner { background: var(--orange); color: white; display: flex; align-items: center; justify-content: space-between; padding: 10px 28px; font-size: 14px; font-weight: 500; }
+  .trial-banner .left { display: flex; align-items: center; gap: 8px; }
+  .upgrade-btn { background: white; color: var(--orange); border: none; border-radius: 20px; padding: 6px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .shell { display: flex; min-height: calc(100vh - 44px); }
+  .sidebar { width: 230px; flex-shrink: 0; background: white; border-right: 1px solid var(--border); padding: 20px 0; font-size: 13.5px; }
+  .sidebar-logo { padding: 0 18px 18px; font-weight: 700; font-size: 17px; color: var(--blue); }
+  .sidebar-search { margin: 0 12px 16px; display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--muted); border: 1px solid var(--border); }
+  .nav-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; padding: 14px 18px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 18px; font-size: 13.5px; color: var(--text); cursor: pointer; }
+  .nav-item:hover { background: var(--bg); }
+  .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; border-left: 3px solid var(--blue); }
+  .nav-icon { width: 15px; height: 15px; opacity: 0.55; flex-shrink: 0; }
+  .sidebar-footer { padding: 14px 12px 0; border-top: 1px solid var(--border); margin-top: 12px; }
+  .get-access { display: flex; align-items: center; gap: 8px; background: #fff0f0; border: none; border-radius: 10px; padding: 10px 14px; width: 100%; font-family: inherit; font-weight: 600; font-size: 13.5px; color: #c0392b; cursor: pointer; }
+  .main { flex: 1; overflow: auto; }
+  .hero { background-color: var(--dark); padding: 48px 56px 40px; color: white; position: relative; }
+  .hero-back { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .hero h1 { font-size: 40px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; letter-spacing: -0.5px; }
+  .hero p { font-size: 15px; color: rgba(255,255,255,0.75); margin-bottom: 28px; max-width: 480px; line-height: 1.6; }
+  .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .hero-cta { background: var(--pink); color: white; border: none; border-radius: 50px; padding: 14px 28px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .hero-secondary { background: rgba(255,255,255,0.12); color: white; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 50px; padding: 13px 22px; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .trial-notice { margin-top: 18px; font-size: 12.5px; color: rgba(255,255,255,0.45); display: flex; align-items: center; gap: 6px; }
+  .content-area { display: grid; grid-template-columns: 1fr 340px; background: var(--dark); }
+  .video-side { padding: 0; }
+  .video-wrap { background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative; }
+  .play-circle { width: 72px; height: 72px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .play-circle svg { margin-left: 5px; }
+  .video-info { padding: 20px 24px; color: white; border-top: 1px solid rgba(255,255,255,0.08); }
+  .video-info .vid-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .video-info .vid-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+  .video-info .vid-desc { font-size: 13.5px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+  .lesson-panel { background: var(--dark2); border-left: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; }
+  .panel-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .panel-tab { flex: 1; padding: 14px 16px; font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,0.45); cursor: pointer; text-align: center; border-bottom: 2px solid transparent; }
+  .panel-tab.active { color: white; border-bottom-color: var(--pink); }
+  .panel-meta { padding: 12px 16px; font-size: 12.5px; color: rgba(255,255,255,0.4); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .lesson-list { overflow-y: auto; max-height: 480px; }
+  .lesson-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+  .lesson-item:hover { background: rgba(255,255,255,0.04); }
+  .lesson-item.active { background: rgba(255,255,255,0.08); }
+  .lesson-thumb { width: 68px; height: 44px; border-radius: 5px; flex-shrink: 0; background: var(--dark3); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .lesson-thumb.locked::after { content: '🔒'; position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .lesson-thumb-img { width: 100%; height: 100%; background: linear-gradient(135deg, #0d2d4a, #1a5276); display: flex; align-items: center; justify-content: center; }
+  .lesson-thumb-img span { font-size: 9px; font-weight: 700; color: white; text-align: center; padding: 4px; line-height: 1.2; }
+  .lesson-info { flex: 1; min-width: 0; }
+  .lesson-title { font-size: 12.5px; font-weight: 600; color: white; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lesson-item.locked-item .lesson-title { color: rgba(255,255,255,0.35); }
+  .lesson-dur { font-size: 11px; color: rgba(255,255,255,0.35); }
+  .watching-badge { font-size: 10px; font-weight: 700; color: var(--pink); display: block; margin-bottom: 1px; }
+  .upgrade-nudge { padding: 14px 16px; background: rgba(224,48,90,0.12); border-top: 1px solid rgba(224,48,90,0.25); }
+  .upgrade-nudge p { font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 10px; line-height: 1.5; }
+  .unlock-btn { background: var(--pink); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; width: 100%; }
+  .topics-section { background: var(--dark); padding: 48px 56px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .topics-section h2 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 32px; text-align: center; }
+  .topic-card { display: grid; grid-template-columns: 260px 1fr; gap: 24px; margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: var(--dark2); border: 1px solid rgba(255,255,255,0.07); }
+  .topic-card.locked { opacity: 0.45; }
+  .topic-thumb { background: linear-gradient(135deg, #0d2d4a, #1a5276); display: flex; align-items: center; justify-content: center; padding: 20px; min-height: 120px; position: relative; }
+  .topic-thumb span { font-size: 13px; font-weight: 700; color: white; text-align: center; line-height: 1.3; }
+  .topic-thumb .dur-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .topic-thumb .lock-badge { position: absolute; top: 8px; right: 8px; font-size: 16px; }
+  .topic-body { padding: 20px 24px; color: white; }
+  .topic-num-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .topic-desc { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+  .topics-cta-wrap { text-align: center; margin-top: 36px; }
+  .topics-unlock-btn { background: var(--pink); color: white; border: none; border-radius: 50px; padding: 16px 40px; font-family: inherit; font-weight: 700; font-size: 16px; cursor: pointer; }
+  .faq-section { background: var(--dark2); padding: 48px 56px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .faq-section h2 { font-size: 22px; font-weight: 700; color: white; margin-bottom: 24px; }
+  .faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 18px 0; }
+  .faq-q { font-size: 14.5px; font-weight: 600; color: white; margin-bottom: 8px; }
+  .faq-a { font-size: 13.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="trial-banner">
+  <div class="left">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Your Free Trial expires in 5 days.
+  </div>
+  <button class="upgrade-btn">UPGRADE NOW</button>
+</div>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo">SimpleNursing</div>
+    <div class="sidebar-search">
+      <svg class="nav-icon" style="opacity:0.4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search all content
+    </div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</div>
+    <div class="nav-label">Practice</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>NCLEX Question Bank</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>NCLEX Readiness Assessments</div>
+    <div class="nav-label">Learn</div>
+    <div class="nav-item active"><svg class="nav-icon" style="opacity:1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>NCLEX Lecture Series</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>NCLEX Study Plan</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>NCLEX Cram Sessions</div>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:10px;">
+      <div class="nav-item">Support</div>
+      <div class="nav-item">Settings</div>
+      <div class="nav-item">Logout</div>
+    </div>
+    <div class="sidebar-footer"><button class="get-access">❤️ Get full access</button></div>
+  </nav>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-back">← HOME</div>
+      <h1>NCLEX Review<br>Lecture Series</h1>
+      <p>Nurse Mike's masterclass on how to pass the NCLEX. Your on-demand tutor!</p>
+      <div class="hero-actions">
+        <button class="hero-cta"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>Start Lecture 1</button>
+        <button class="hero-secondary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share with a friend</button>
+      </div>
+      <div class="trial-notice">🔒 You have access to Lecture 1 of 26. Upgrade to unlock the full series.</div>
+    </div>
+
+    <div class="content-area">
+      <div class="video-side">
+        <div class="video-wrap"><div class="play-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="#0b5ea8"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        <div class="video-info">
+          <div class="vid-label">Video 1 · 58 min 42 s</div>
+          <div class="vid-title">NCLEX Strategy &amp; Insights</div>
+          <div class="vid-desc">Discover key steps of study planning, manage test anxiety, and prioritize questions effectively in this must-watch series opener.</div>
+        </div>
+      </div>
+      <div class="lesson-panel">
+        <div class="panel-tabs"><div class="panel-tab active">Lessons (26)</div><div class="panel-tab" style="opacity:0.4">My notes</div></div>
+        <div class="panel-meta">26 videos • 26 hr 40 min</div>
+        <div class="lesson-list">
+          <div class="lesson-item active"><div class="lesson-thumb"><div class="lesson-thumb-img"><span>NCLEX Strategy &amp; Insights</span></div></div><div class="lesson-info"><span class="watching-badge">● Watching Now</span><div class="lesson-title">Video 1: NCLEX Strategy &amp; Insights</div><div class="lesson-dur">58 min 42 s</div></div></div>
+          <div class="lesson-item locked-item"><div class="lesson-thumb locked"><div class="lesson-thumb-img"><span>Prioritization &amp; Delegation</span></div></div><div class="lesson-info"><div class="lesson-title">Video 2: Prioritization &amp; Delegation</div><div class="lesson-dur">58 min 26 s</div></div></div>
+          <div class="lesson-item locked-item"><div class="lesson-thumb locked"><div class="lesson-thumb-img"><span>Ethics &amp; Legal</span></div></div><div class="lesson-info"><div class="lesson-title">Video 3: Ethics &amp; Legal Fundamentals</div><div class="lesson-dur">1 hr 10 min 47 s</div></div></div>
+          <div class="lesson-item locked-item"><div class="lesson-thumb locked"><div class="lesson-thumb-img"><span>ABG &amp; Acid Base</span></div></div><div class="lesson-info"><div class="lesson-title">Video 4: ABG &amp; Acid Base Imbalances</div><div class="lesson-dur">24 min 43 s</div></div></div>
+          <div class="lesson-item locked-item"><div class="lesson-thumb locked"><div class="lesson-thumb-img"><span>Electrolytes</span></div></div><div class="lesson-info"><div class="lesson-title">Video 5: Electrolytes</div><div class="lesson-dur">33 min 18 s</div></div></div>
+          <div class="lesson-item locked-item"><div class="lesson-thumb locked"><div class="lesson-thumb-img"><span>+ 21 more</span></div></div><div class="lesson-info"><div class="lesson-title" style="color:rgba(255,255,255,0.25)">Videos 6–26</div><div class="lesson-dur">Unlock to access</div></div></div>
+        </div>
+        <div class="upgrade-nudge"><p>You're watching Lecture 1 of 26. Upgrade to unlock the full 26 hr 40 min series.</p><button class="unlock-btn">Unlock all 26 lectures</button></div>
+      </div>
+    </div>
+
+    <div class="topics-section">
+      <h2>Lecture Series Topics</h2>
+      <div class="topic-card"><div class="topic-thumb"><span>NCLEX Strategy &amp; Insights</span><div class="dur-badge">00:58:42</div></div><div class="topic-body"><div class="topic-num-title">1. NCLEX Strategy &amp; Insights</div><div class="topic-desc">Discover key steps of study planning, manage test anxiety, and prioritize questions effectively in this must-watch series opener.</div></div></div>
+      <div class="topic-card locked"><div class="topic-thumb"><span>Prioritization &amp; Delegation</span><div class="dur-badge">00:58:26</div><div class="lock-badge">🔒</div></div><div class="topic-body"><div class="topic-num-title">2. Prioritization &amp; Delegation</div><div class="topic-desc">The key to unlocking safe practice standards with prioritization and delegation, crucial concepts that stand the test of time in every NCLEX iteration.</div></div></div>
+      <div class="topic-card locked"><div class="topic-thumb"><span>Pharmacology Mastery</span><div class="dur-badge">03:09:26</div><div class="lock-badge">🔒</div></div><div class="topic-body"><div class="topic-num-title">7. Pharmacology Mastery</div><div class="topic-desc">Ace pharmacology with ease! Master the top tested NCLEX drugs, dosages, drug actions and contraindications through fun mnemonic devices.</div></div></div>
+      <div class="topic-card locked" style="opacity:0.25"><div class="topic-thumb"><span>+ 22 more lectures</span></div><div class="topic-body"><div class="topic-num-title" style="color:rgba(255,255,255,0.4)">Lectures 3–6 &amp; 8–26</div><div class="topic-desc">Respiratory, Cardiac, Renal, Endocrine, Mental Health, Pediatrics, Maternity, and more — all included with a membership.</div></div></div>
+      <div class="topics-cta-wrap"><button class="topics-unlock-btn">Unlock all 26 lectures</button></div>
+    </div>
+
+    <div class="faq-section">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-item"><div class="faq-q">When should I watch these videos?</div><div class="faq-a">Watch these Lectures early on in your NCLEX studies — they give you valuable tips and tricks for the difficult topics.</div></div>
+      <div class="faq-item"><div class="faq-q">How many lectures should I watch a day?</div><div class="faq-a">We recommend no more than 3 hours of video content of any kind each day. Break up your studies with videos, questions and rationale remediation for the best results.</div></div>
+      <div class="faq-item"><div class="faq-q">How do I maximize value while watching the lectures?</div><div class="faq-a">Take copious notes! Closed captions are available and you can use the notes section alongside the video player.</div></div>
+      <div class="faq-item"><div class="faq-q">Is there an order I should watch these in?</div><div class="faq-a">We suggest watching in the order listed. The first video is full of study and prep advice — a great start for anyone.</div></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

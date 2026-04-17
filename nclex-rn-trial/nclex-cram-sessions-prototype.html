@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCLEX Cram Sessions — Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #0b5ea8; --blue-light: #e8f0fb; --bg: #f4f6f9;
+    --border: #e2e7ee; --text: #1a2332; --muted: #6b7a8f;
+    --orange: #e85c0d; --pink: #e0305a; --dark: #111418;
+    --dark2: #1c2128; --yellow: #f5c518; --green: #2e9e6b;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  .trial-banner { background: var(--orange); color: white; display: flex; align-items: center; justify-content: space-between; padding: 10px 28px; font-size: 14px; font-weight: 500; }
+  .trial-banner .left { display: flex; align-items: center; gap: 8px; }
+  .upgrade-btn-banner { background: white; color: var(--orange); border: none; border-radius: 20px; padding: 6px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+  .shell { display: flex; min-height: calc(100vh - 44px); }
+
+  .sidebar { width: 230px; flex-shrink: 0; background: white; border-right: 1px solid var(--border); padding: 20px 0; font-size: 13.5px; }
+  .sidebar-logo { padding: 0 18px 18px; font-weight: 700; font-size: 17px; color: var(--blue); }
+  .sidebar-search { margin: 0 12px 16px; display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--muted); border: 1px solid var(--border); }
+  .nav-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; padding: 14px 18px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 18px; font-size: 13.5px; color: var(--text); cursor: pointer; }
+  .nav-item:hover { background: var(--bg); }
+  .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; border-left: 3px solid var(--blue); }
+  .nav-icon { width: 15px; height: 15px; opacity: 0.55; flex-shrink: 0; }
+  .sidebar-footer { padding: 14px 12px 0; border-top: 1px solid var(--border); margin-top: 12px; }
+  .get-access { display: flex; align-items: center; gap: 8px; background: #fff0f0; border: none; border-radius: 10px; padding: 10px 14px; width: 100%; font-family: inherit; font-weight: 600; font-size: 13.5px; color: #c0392b; cursor: pointer; }
+
+  .main { flex: 1; overflow: auto; }
+
+  .hero { background: var(--dark); padding: 52px 56px 48px; display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(to right, var(--yellow), transparent); }
+  .hero-text { max-width: 520px; z-index: 1; }
+  .hero-text h1 { font-size: 46px; font-weight: 800; color: white; line-height: 1.1; margin-bottom: 14px; letter-spacing: -0.5px; }
+  .hero-text h1 span { color: var(--yellow); }
+  .hero-text p { font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 22px; max-width: 440px; }
+  .hero-callout { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 14px 18px; font-size: 13.5px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+  .hero-callout a { color: var(--yellow); font-weight: 600; }
+  .hero-video { flex-shrink: 0; width: 360px; border-radius: 12px; overflow: hidden; background: #000; z-index: 1; }
+  .hero-video-inner { aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0d2d4a, #1a3a5c); position: relative; }
+  .play-btn { width: 56px; height: 56px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .play-btn svg { margin-left: 4px; }
+  .video-dur { position: absolute; bottom: 8px; right: 10px; background: rgba(0,0,0,0.7); color: white; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .video-label { background: var(--dark2); padding: 12px 16px; font-size: 13px; color: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 8px; }
+
+  .section { padding: 40px 56px; }
+  .section + .section { padding-top: 0; }
+  .section-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .section-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 24px; }
+
+  .live-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .live-card { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+  .live-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #e53e3e; flex-shrink: 0; }
+  .live-tag { font-size: 12px; font-weight: 700; color: #e53e3e; letter-spacing: 0.05em; }
+  .live-date { font-size: 36px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+  .live-time { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .live-format { font-size: 13px; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+
+  .elite-gate { background: #fdf3e0; border: 1px solid #f5c518; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .elite-gate-text { font-size: 13px; font-weight: 600; color: #7a5c00; }
+  .elite-upgrade-link { font-size: 13px; font-weight: 700; color: var(--blue); white-space: nowrap; }
+
+  .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 28px; }
+  .tab { padding: 12px 24px; font-size: 14.5px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+  .tab .new-badge { background: var(--pink); color: white; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 1px 6px; margin-left: 6px; }
+
+  .snippets-scope { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .snippets-scope strong { color: var(--text); }
+  .search-bar { width: 100%; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-family: inherit; font-size: 14px; color: var(--text); margin-bottom: 20px; }
+
+  .snippet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .snippet-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .snippet-thumb { width: 56px; height: 56px; border-radius: 8px; background: var(--bg); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .snippet-info { flex: 1; min-width: 0; }
+  .snippet-cat { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .snippet-title { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+  .snippet-dur { font-size: 12px; color: var(--muted); }
+  .snippet-upgrade { font-size: 11.5px; color: var(--blue); font-weight: 600; margin-top: 4px; }
+
+  .full-sessions-list { display: flex; flex-direction: column; gap: 12px; }
+  .full-session-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; display: flex; align-items: center; gap: 18px; }
+  .full-session-thumb { width: 80px; height: 52px; border-radius: 8px; background: var(--bg); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .full-session-info { flex: 1; }
+  .full-session-tag { font-size: 10.5px; font-weight: 700; color: var(--pink); letter-spacing: 0.06em; margin-bottom: 4px; }
+  .full-session-title { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; }
+  .full-session-meta { font-size: 12.5px; color: var(--muted); }
+  .full-session-lock { font-size: 13px; color: var(--blue); font-weight: 600; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div class="trial-banner">
+  <div class="left">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Your Free Trial expires in 5 days.
+  </div>
+  <button class="upgrade-btn-banner">UPGRADE NOW</button>
+</div>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo">SimpleNursing</div>
+    <div class="sidebar-search">
+      <svg class="nav-icon" style="opacity:0.4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search all content
+    </div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</div>
+    <div class="nav-label">Practice</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>NCLEX Question Bank</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>NCLEX Readiness Assessments</div>
+    <div class="nav-label">Learn</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>NCLEX Lecture Series</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>NCLEX Study Plan</div>
+    <div class="nav-item active"><svg class="nav-icon" style="opacity:1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>NCLEX Cram Sessions</div>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:10px;">
+      <div class="nav-item">Support</div>
+      <div class="nav-item">Settings</div>
+      <div class="nav-item">Logout</div>
+    </div>
+    <div class="sidebar-footer"><button class="get-access">❤️ Get full access</button></div>
+  </nav>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>NCLEX<br><span>Cram Sessions</span></h1>
+        <p>Live monthly sessions with Nurse Mike. Watch, ask questions, and get exam-ready.</p>
+        <div class="hero-callout">Monthly live sessions via Zoom + a growing library of session recordings and snippets.<br>🔒 Unlock everything with a <a href="#">membership</a>.</div>
+      </div>
+      <div class="hero-video">
+        <div class="hero-video-inner">
+          <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="#0b5ea8"><polygon points="5,3 19,12 5,21"/></svg></div>
+          <div class="video-dur">1:07</div>
+        </div>
+        <div class="video-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>Your last-minute NCLEX lifeline</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Join the upcoming live sessions</div>
+      <div class="section-desc">Live via Zoom with Nurse Mike — Q&amp;A included. Exclusive to Elite members.</div>
+      <div class="live-grid">
+        <div class="live-card">
+          <div class="live-card-header"><div class="live-dot"></div><div class="live-tag">LIVE</div><span style="font-size:13px;color:var(--muted);">Cram Session</span></div>
+          <div class="live-date">April 21st</div>
+          <div class="live-time">06:00PM EST (3pm PST)</div>
+          <div class="live-format"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Live Zoom session with Nurse Mike — Q&amp;A included</div>
+          <div class="elite-gate"><span class="elite-gate-text">🔒 Elite membership required</span><a class="elite-upgrade-link" href="#">Upgrade to Elite →</a></div>
+        </div>
+        <div class="live-card">
+          <div class="live-card-header"><div class="live-dot"></div><div class="live-tag">LIVE</div><span style="font-size:13px;color:var(--muted);">Cram Session</span></div>
+          <div class="live-date">May 19th</div>
+          <div class="live-time">06:00PM EST (3pm PST)</div>
+          <div class="live-format"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Live Zoom session with Nurse Mike — Q&amp;A included</div>
+          <div class="elite-gate"><span class="elite-gate-text">🔒 Elite membership required</span><a class="elite-upgrade-link" href="#">Upgrade to Elite →</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="tabs">
+        <div class="tab active">Session Snippets</div>
+        <div class="tab">Full Sessions <span class="new-badge">NEW</span></div>
+      </div>
+      <div>
+        <div class="snippets-scope"><strong>16 snippets available to preview.</strong> Unlock full sessions with a membership.</div>
+        <input class="search-bar" placeholder="Search session snippets" type="text">
+        <div class="snippet-grid">
+          <div class="snippet-card"><div class="snippet-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="snippet-info"><div class="snippet-cat">Key Priorities</div><div class="snippet-title">ABC and Systemic vs Localized Infections Key Priorities</div><div class="snippet-dur">44s</div><div class="snippet-upgrade">🔒 Upgrade to access</div></div></div>
+          <div class="snippet-card"><div class="snippet-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="snippet-info"><div class="snippet-cat">Question Language</div><div class="snippet-title">Avoid Absolutes Mastering NCLEX Question Language</div><div class="snippet-dur">48s</div><div class="snippet-upgrade">🔒 Upgrade to access</div></div></div>
+          <div class="snippet-card"><div class="snippet-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="snippet-info"><div class="snippet-cat">NCLEX</div><div class="snippet-title">Build Confidence Review Known Topics Before Test Day</div><div class="snippet-dur">50s</div><div class="snippet-upgrade">🔒 Upgrade to access</div></div></div>
+          <div class="snippet-card"><div class="snippet-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="snippet-info"><div class="snippet-cat">Question Types</div><div class="snippet-title">NGN Question Types Tackling Bowtie and Drag and Drop</div><div class="snippet-dur">11m 31s</div><div class="snippet-upgrade">🔒 Upgrade to access</div></div></div>
+          <div class="snippet-card"><div class="snippet-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="snippet-info"><div class="snippet-cat">NCLEX Strategy</div><div class="snippet-title">Prioritizing Non Invasive Interventions NCLEX Strategy</div><div class="snippet-dur">1m 26s</div><div class="snippet-upgrade">🔒 Upgrade to access</div></div></div>
+          <div class="snippet-card"><div class="snippet-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="snippet-info"><div class="snippet-cat">Calm</div><div class="snippet-title">Stay Calm Visualize Success and Maintain Composure</div><div class="snippet-dur">5m 42s</div><div class="snippet-upgrade">🔒 Upgrade to access</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="display:none" id="full-sessions">
+      <div class="snippets-scope"><strong>8 full session recordings, ~1.5 hours each.</strong> Unlock with a membership.</div>
+      <div class="full-sessions-list">
+        <div class="full-session-card"><div class="full-session-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.3"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="full-session-info"><div class="full-session-tag">FULL SESSION</div><div class="full-session-title">Full Session of November 21, 2024</div><div class="full-session-meta">1h 30m · Topic TBC</div></div><div class="full-session-lock">🔒 Upgrade to access</div></div>
+        <div class="full-session-card"><div class="full-session-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.3"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="full-session-info"><div class="full-session-tag">FULL SESSION</div><div class="full-session-title">Full Session of November 7, 2024</div><div class="full-session-meta">1h 32m · Topic TBC</div></div><div class="full-session-lock">🔒 Upgrade to access</div></div>
+        <div class="full-session-card"><div class="full-session-thumb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.3"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></div><div class="full-session-info"><div class="full-session-tag">FULL SESSION</div><div class="full-session-title">Full Session of October 17, 2024</div><div class="full-session-meta">1h 36m · Topic TBC</div></div><div class="full-session-lock">🔒 Upgrade to access</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach((tab, i) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const snippets = document.querySelector('.snippet-grid').closest('.section');
+      const full = document.getElementById('full-sessions');
+      if (i === 0) {
+        snippets.querySelector('.snippets-scope').style.display = '';
+        snippets.querySelector('.search-bar').style.display = '';
+        snippets.querySelector('.snippet-grid').style.display = 'grid';
+        full.style.display = 'none';
+      } else {
+        snippets.querySelector('.snippets-scope').style.display = 'none';
+        snippets.querySelector('.search-bar').style.display = 'none';
+        snippets.querySelector('.snippet-grid').style.display = 'none';
+        full.style.display = 'block';
+      }
+    });
+  });
+</script>
+</body>
+</html>

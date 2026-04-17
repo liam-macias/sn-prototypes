@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCLEX Readiness Assessments — Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #0b5ea8; --blue-dark: #084a86; --blue-light: #e8f0fb;
+    --green: #2e9e6b; --bg: #f4f6f9; --border: #e2e7ee;
+    --text: #1a2332; --muted: #6b7a8f; --orange: #e85c0d;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .trial-banner { background: var(--orange); color: white; display: flex; align-items: center; justify-content: space-between; padding: 10px 28px; font-size: 14px; font-weight: 500; gap: 12px; }
+  .trial-banner .left { display: flex; align-items: center; gap: 8px; }
+  .upgrade-btn { background: white; color: var(--orange); border: none; border-radius: 20px; padding: 6px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .shell { display: flex; min-height: calc(100vh - 44px); }
+  .sidebar { width: 230px; flex-shrink: 0; background: white; border-right: 1px solid var(--border); padding: 20px 0; font-size: 13.5px; }
+  .sidebar-logo { padding: 0 18px 18px; font-weight: 700; font-size: 17px; color: var(--blue); }
+  .sidebar-search { margin: 0 12px 16px; display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--muted); border: 1px solid var(--border); }
+  .nav-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; padding: 14px 18px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 18px; font-size: 13.5px; color: var(--text); cursor: pointer; }
+  .nav-item:hover { background: var(--bg); }
+  .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; border-left: 3px solid var(--blue); }
+  .nav-icon { width: 15px; height: 15px; opacity: 0.55; flex-shrink: 0; }
+  .sidebar-footer { padding: 14px 12px 0; border-top: 1px solid var(--border); margin-top: 12px; }
+  .get-access { display: flex; align-items: center; gap: 8px; background: #fff0f0; border: none; border-radius: 10px; padding: 10px 14px; width: 100%; font-family: inherit; font-weight: 600; font-size: 13.5px; color: #c0392b; cursor: pointer; }
+  .main { flex: 1; overflow: auto; }
+  .hero { background: linear-gradient(135deg, #e8f0fb 0%, #dde8f7 60%, #cdd9f0 100%); padding: 52px 56px 44px; display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -40px; top: -60px; width: 340px; height: 340px; background: radial-gradient(circle, rgba(245,197,24,0.2) 0%, transparent 70%); pointer-events: none; }
+  .hero-text { max-width: 560px; z-index: 1; }
+  .hero-text h1 { font-family: 'DM Serif Display', serif; font-size: 46px; line-height: 1.1; color: var(--text); margin-bottom: 16px; }
+  .hero-text h1 span { color: var(--blue); }
+  .hero-text p { font-size: 16px; line-height: 1.6; color: #3a4a60; max-width: 460px; }
+  .hero-callout { background: white; border-radius: 12px; padding: 16px 18px; max-width: 280px; font-size: 13.5px; line-height: 1.5; box-shadow: 0 4px 16px rgba(0,0,0,0.08); z-index: 1; flex-shrink: 0; border-left: 3px solid var(--blue); }
+  .hero-callout strong { color: var(--blue); display: block; margin-bottom: 4px; }
+  .hero-callout a { color: var(--blue); font-weight: 600; }
+  .steps { padding: 40px 56px 0; }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+  .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { background: white; border-radius: 14px; padding: 24px 20px; text-align: center; border: 1px solid var(--border); }
+  .card-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 22px; }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .card.accent { background: var(--blue); border-color: var(--blue); }
+  .card.accent h3, .card.accent p { color: white; }
+  .card.accent .card-icon { background: rgba(255,255,255,0.15); }
+  .exams { padding: 36px 56px 60px; }
+  .exams h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .exams-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+  .exams-desc strong { color: var(--text); }
+  .exam-list { display: flex; flex-direction: column; gap: 10px; }
+  .exam-row { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; display: flex; align-items: center; gap: 20px; }
+  .exam-row.unlocked { border-color: var(--blue); border-width: 1.5px; }
+  .exam-row.locked { background: #fafbfc; }
+  .exam-num { font-size: 15px; font-weight: 700; min-width: 60px; }
+  .exam-row.locked .exam-num { color: #bcc4ce; }
+  .exam-mid { flex: 1; }
+  .exam-specs { font-size: 13px; color: var(--muted); }
+  .exam-specs .dot { margin: 0 6px; color: var(--border); }
+  .time-ok { color: var(--green); font-weight: 600; }
+  .locked-label { font-size: 13px; color: #9aa5b4; display: flex; align-items: center; gap: 6px; }
+  .start-btn { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-family: inherit; font-weight: 700; font-size: 13.5px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .start-btn:hover { background: var(--blue-dark); }
+  .start-btn:disabled { background: #e2e7ee; color: #b0bac6; cursor: default; }
+</style>
+</head>
+<body>
+
+<div class="trial-banner">
+  <div class="left">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Your Free Trial expires in 5 days.
+  </div>
+  <button class="upgrade-btn">UPGRADE NOW</button>
+</div>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo">SimpleNursing</div>
+    <div class="sidebar-search">
+      <svg class="nav-icon" style="opacity:0.4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search all content
+    </div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</div>
+    <div class="nav-label">Practice</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>NCLEX Question Bank</div>
+    <div class="nav-item active"><svg class="nav-icon" style="opacity:1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>NCLEX Readiness Assessments</div>
+    <div class="nav-label">Learn</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>NCLEX Lecture Series</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>NCLEX Study Plan</div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>NCLEX Cram Sessions</div>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:10px;"><div class="nav-item">Support</div><div class="nav-item">Settings</div><div class="nav-item">Logout</div></div>
+    <div class="sidebar-footer"><button class="get-access">❤️ Get full access</button></div>
+  </nav>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>NCLEX<br><span>Readiness</span> Exams</h1>
+        <p>Practice like it's the real thing with adaptive exams built by the writers who helped create the NCLEX.</p>
+      </div>
+      <div class="hero-callout"><strong>🔒 You have access to 1 of 6 exams</strong>Unlock all 6 full-length adaptive exams with a <a href="#">SimpleNursing membership</a>.</div>
+    </div>
+
+    <div class="steps">
+      <div class="eyebrow">How it works</div>
+      <div class="steps-grid">
+        <div class="card"><div class="card-icon">📋</div><h3>Select your assessment</h3><p>Choose from a list of available exams. Each one is a new opportunity to prove your readiness.</p></div>
+        <div class="card"><div class="card-icon">🎯</div><h3>One try, like the real thing</h3><p>Each exam is designed to simulate real NCLEX conditions. Take it once — so your score actually means something.</p></div>
+        <div class="card"><div class="card-icon">📚</div><h3>Comprehensive questions</h3><p>Every exam covers the essential NCLEX topics, including NGN, SATA, &amp; Traditional questions.</p></div>
+        <div class="card accent"><div class="card-icon">📊</div><h3>Know where you stand</h3><p>Each exam scores your readiness by topic so you know exactly what to study next.</p></div>
+      </div>
+    </div>
+
+    <div class="exams">
+      <h2>Select your assessment</h2>
+      <div class="exams-desc"><strong>6 full-length adaptive exams.</strong> Each covers the full NCLEX blueprint — NGN, SATA, and traditional question types.</div>
+      <div class="exam-list">
+        <div class="exam-row unlocked"><div class="exam-num">Exam 1</div><div class="exam-mid"><div class="exam-specs">75 questions<span class="dot">·</span>2 hours<span class="dot">·</span><span class="time-ok">120 min remaining</span></div></div><button class="start-btn">START EXAM</button></div>
+        <div class="exam-row locked"><div class="exam-num">Exam 2</div><div class="exam-mid"><div class="locked-label">🔒 Upgrade to access</div></div><button class="start-btn" disabled>START EXAM</button></div>
+        <div class="exam-row locked"><div class="exam-num">Exam 3</div><div class="exam-mid"><div class="locked-label">🔒 Upgrade to access</div></div><button class="start-btn" disabled>START EXAM</button></div>
+        <div class="exam-row locked"><div class="exam-num">Exam 4</div><div class="exam-mid"><div class="locked-label">🔒 Upgrade to access</div></div><button class="start-btn" disabled>START EXAM</button></div>
+        <div class="exam-row locked"><div class="exam-num">Exam 5</div><div class="exam-mid"><div class="locked-label">🔒 Upgrade to access</div></div><button class="start-btn" disabled>START EXAM</button></div>
+        <div class="exam-row locked"><div class="exam-num">Exam 6</div><div class="exam-mid"><div class="locked-label">🔒 Upgrade to access</div></div><button class="start-btn" disabled>START EXAM</button></div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
