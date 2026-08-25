@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SimpleNursing — Classes prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--blue100:#cce2eb;--blue200:#99c5d7;--blue400:#338caf;--blue:#00709c;--blue600:#00597c;--blue700:#00435d;
+--pink100:#fed6e0;--pink:#fc3467;--cerise:#dc2d5a;--cerise6:#b02448;
+--yel100:#fef7db;--yel:#fad74f;--yel700:#96812f;
+--grn100:#dff5e2;--grn:#62d070;--grn700:#3a7c43;
+--n0:#fff;--n075:#f5f5f5;--n100:#ececec;--n200:#d9d9d9;--n300:#c7c7c7;--n600:#818181;--n700:#616161;--n800:#404040;--n900:#202020;
+--err:#cb0000;--infosoft:#d2f1f6;
+--tx:#202020;--tx2:#616161;--muted:#888;
+--page:#f4f4f5;--active:#f0f5f9;
+--bd:rgba(0,0,0,.10);--dv:rgba(136,136,136,.30);
+--r:8px;--rm:12px;--rl:16px;--rp:9999px;
+--sh:0 1px 2px rgba(12,12,13,.05),0 1px 3px rgba(12,12,13,.10);
+--shm:0 4px 12px rgba(12,12,13,.08);
+--shl:0 12px 32px rgba(11,78,104,.16);
+--f:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+--fu:"Inter","Open Sans",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--page);color:var(--tx);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:var(--blue);text-decoration:none;cursor:pointer}
+input,select{font-family:inherit;font-size:14px}
+::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:var(--n200);border-radius:9px}
+
+#devbar{position:fixed;bottom:14px;right:14px;z-index:400;font-family:var(--fu);display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#devbar .knob{width:26px;height:26px;border-radius:50%;background:rgba(29,26,34,.28);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1;opacity:.5;transition:opacity 140ms,background 140ms}
+#devbar .knob:hover{opacity:1;background:#1d1a22}
+#devbar .panel{background:#1d1a22;color:#fff;border-radius:var(--rm);box-shadow:0 12px 34px rgba(0,0,0,.35);padding:12px 14px;width:250px}
+#devbar .panel b{display:block;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:9.5px;color:#9fc7d8;margin-bottom:7px}
+#devbar .panel button{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,.24);border-radius:6px;padding:5px 10px;color:#fff;font-size:11.5px;margin-bottom:5px}
+#devbar .panel button:hover{background:rgba(255,255,255,.14)}
+#devbar .panel button.on{background:#fff;color:#1d1a22;border-color:#fff;font-weight:600}
+#devbar .panel .foot{border-top:1px solid rgba(255,255,255,.16);margin-top:8px;padding-top:9px;font-size:10.5px;color:#9a97a2}
+.shell{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:#fff;border-right:1px solid var(--bd);padding:20px 0 40px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-weight:800;font-size:19px;padding:0 18px 15px;letter-spacing:-.01em}
+.brand .a{color:var(--blue)}.brand .b{color:var(--pink)}
+.sbox{margin:0 16px 14px;display:flex;align-items:center;gap:8px;border:1px solid var(--n200);border-radius:var(--rp);padding:7px 13px;color:var(--muted);font-size:13px}
+.ptabs{display:flex;gap:18px;padding:0 18px;border-bottom:1px solid var(--bd);margin-bottom:12px}
+.ptabs div{font-size:11.5px;font-weight:700;letter-spacing:.06em;padding-bottom:9px;color:var(--n600);cursor:pointer}
+.ptabs div.on{color:var(--blue);border-bottom:2.5px solid var(--blue)}
+.nsec{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--n600);padding:16px 18px 6px}
+.nit{display:flex;align-items:center;gap:10px;padding:8px 18px;font-size:14px;color:var(--n800);cursor:pointer}
+.nit:hover{background:var(--n075)}
+.nit.on{background:var(--active);color:var(--blue);font-weight:600;box-shadow:inset 3px 0 0 var(--blue)}
+.nit .ic{width:15px;text-align:center;opacity:.7;font-size:12px}
+.nsub{padding:6px 18px 6px 43px;font-size:13px;color:var(--n700);cursor:pointer;display:flex;align-items:center;gap:8px}
+.nsub:hover{background:var(--n075)}
+.nsub.on{color:var(--blue);font-weight:600;background:var(--active)}
+.ndiv{height:1px;background:var(--bd);margin:12px 16px}
+.addcls{margin:6px 18px 0;font-size:12.5px;font-weight:700;color:var(--pink);letter-spacing:.03em;cursor:pointer}
+
+.main{flex:1;min-width:0;padding:26px 34px 70px;max-width:1200px}
+.crumb{font-size:12px;color:var(--n600);margin-bottom:7px}
+.crumb a:hover{color:var(--blue)}
+.eb{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}
+h1{font-size:29px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
+h2{font-size:19px;font-weight:600}
+h3{font-size:15px;font-weight:700}
+.sub{color:var(--tx2);font-size:13.5px}
+.muted{color:var(--muted);font-size:13px}
+.sm{font-size:12.5px;color:var(--tx2)}
+
+.card{background:#fff;border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:22px 24px;margin-bottom:18px}
+.card.t{padding:16px 18px}
+.chead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.chead h2{display:flex;align-items:center;gap:9px}
+.more{font-size:13px;font-weight:600;color:var(--blue);white-space:nowrap}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:var(--rp);font-weight:600;font-size:13.5px;padding:8px 18px;transition:all 140ms cubic-bezier(.4,0,.2,1);white-space:nowrap}
+.bo{border:1.4px solid var(--blue);color:var(--blue);background:#fff}.bo:hover{background:var(--active)}
+.bp{background:var(--pink);color:#fff}.bp:hover{background:var(--cerise6)}
+.bb{background:var(--blue);color:#fff}.bb:hover{background:var(--blue600)}
+.bt{color:var(--blue);padding:8px 10px}.bt:hover{background:var(--active)}
+.bg{border:1.4px solid var(--n200);color:var(--n700);background:#fff}.bg:hover{background:var(--n075)}
+.s{font-size:12.5px;padding:6px 14px}
+.lg{font-size:15px;padding:11px 26px}
+.btn[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:var(--rp);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 11px;font-family:var(--fu)}
+.cb{background:var(--blue);color:#fff}.cl{background:var(--blue100);color:var(--blue700)}
+.cg{background:var(--grn100);color:var(--grn700)}.cy{background:var(--yel100);color:var(--yel700)}
+.cp{background:var(--pink100);color:var(--cerise6)}.cn{background:var(--n100);color:var(--n700)}
+
+.bar{height:6px;border-radius:var(--rp);background:var(--n100);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:var(--rp);transition:width 240ms}
+.bar.p i{background:var(--pink)}.bar.g i{background:var(--grn)}
+.seg{display:flex;gap:4px}
+.seg span{height:6px;flex:1;border-radius:var(--rp);background:var(--n100)}
+.seg span.d{background:var(--blue)}.seg span.a{background:var(--pink)}
+
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.split{display:grid;grid-template-columns:1fr 316px;gap:18px;align-items:start}
+@media(max-width:1140px){.split,.g2{grid-template-columns:1fr}}
+.btw{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.mt{margin-top:14px}.mt2{margin-top:24px}.mb{margin-bottom:12px}
+.hr{height:1px;background:var(--dv);margin:16px 0}
+
+.thumb{border-radius:6px;height:104px;display:flex;align-items:flex-end;padding:8px;color:#fff;font-weight:800;font-size:12.5px;line-height:1.15;text-transform:uppercase;position:relative;overflow:hidden;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.thumb .dur{position:absolute;right:7px;bottom:7px;background:rgba(0,0,0,.62);border-radius:3px;font-size:10.5px;padding:1px 5px;font-weight:600;text-transform:none}
+.thumb.gd{background:linear-gradient(135deg,#eaf5f9,#cce2eb);color:var(--blue700);text-shadow:none;border:1px solid var(--blue100)}
+.thumb.qz{background:linear-gradient(135deg,#00597c,#00343f)}
+
+.lrow{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--n100)}
+.lrow:last-child{border-bottom:none}
+.lrow .ico{width:33px;height:33px;flex:0 0 33px;border-radius:6px;background:var(--active);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px}
+.lrow .gr{flex:1;min-width:0}
+.lrow .t{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .m{font-size:12.5px;color:var(--tx2)}
+
+.tcard{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;border:1px solid var(--bd);border-radius:var(--r);margin-bottom:9px;background:#fff;overflow:hidden}
+.tcard .lead{padding:14px 18px;border-left:5px solid var(--n200);display:flex;flex-direction:column;gap:2px}
+.tcard.ip .lead{border-left-color:var(--blue400);background:#f8fbfd}
+.tcard.dn .lead{border-left-color:var(--grn);background:#fbfefc}
+.tcard .nm{font-size:15.5px;font-weight:700;cursor:pointer}
+.tcard .nm:hover{color:var(--blue)}
+.tcard .rt{padding:14px 18px;display:flex;align-items:center;gap:16px}
+.steps{display:flex;gap:6px}
+.step{border-radius:var(--rp);font-size:10px;font-weight:700;letter-spacing:.07em;padding:5px 12px;font-family:var(--fu);border:1px solid transparent;cursor:pointer}
+.step.td{background:#fff;border-color:var(--n200);color:var(--n600)}
+.step.td:hover{border-color:var(--blue);color:var(--blue)}
+.step.dn{background:var(--blue);color:#fff}
+.step.ro{cursor:default}
+.step.ro.td:hover{border-color:var(--n200);color:var(--n600)}
+.tcard.next{box-shadow:0 0 0 2px var(--blue100)}
+.tcard.next .lead{border-left-color:var(--blue);background:var(--active)}
+
+.hero{background:linear-gradient(120deg,#fff,#eef6fa);border:1px solid var(--bd);border-radius:var(--rm);padding:24px 26px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:24px}
+.mike{width:128px;height:96px;border-radius:var(--r);background:linear-gradient(140deg,#2f7fa3,#17516e);flex:0 0 128px;display:flex;align-items:center;justify-content:center;color:#cfe8f2;font-size:10px;font-weight:700;letter-spacing:.09em;font-family:var(--fu)}
+.banner{display:flex;align-items:center;gap:12px;background:var(--infosoft);border-radius:var(--r);padding:11px 16px;font-size:13.5px;margin-top:14px}
+.banner.w{background:var(--yel100)}
+.banner .cta{margin-left:auto;font-weight:700;color:var(--blue);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.empty{text-align:center;padding:34px 20px;color:var(--tx2)}
+.empty .bg2{font-size:17px;font-weight:600;color:var(--tx);margin-bottom:6px}
+.scr{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+.scr>*{flex:0 0 228px}
+.kv{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--n100)}
+.kv:last-child{border-bottom:none}
+.logrow{display:flex;gap:10px;font-size:13px;padding:7px 0;border-bottom:1px solid var(--n100)}
+.logrow:last-child{border-bottom:none}
+.logrow .d{width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:7px;flex:0 0 6px}
+.logrow .m{color:var(--muted);font-size:11.5px}
+
+.note{display:block;background:#f6f2fd;border:1px dashed #c9bff0;border-radius:var(--r);padding:10px 13px;font-size:12.5px;color:#584a86;margin:10px 0;font-family:var(--fu);line-height:1.45}
+.note b{color:#3d3163}
+.tier{display:inline-flex;align-items:center;gap:5px;font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#6b5ea6;background:#f1eefb;border:1px solid #d8cff5;border-radius:var(--rp);padding:3px 9px}
+body.nonotes .note,body.nonotes .tier{display:none}
+
+.scrim{position:fixed;inset:0;background:rgba(20,24,28,.48);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:52px 20px 80px;overflow-y:auto}
+.modal{background:#fff;border-radius:var(--rm);box-shadow:var(--shl);width:100%;max-width:640px;padding:26px 28px}
+.modal.w{max-width:860px}
+.field{margin-top:15px}
+.field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--n700);margin-bottom:6px}
+.field input,.field select{width:100%;border:1px solid var(--n200);border-radius:var(--r);padding:10px 12px;font-size:14.5px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,112,156,.18)}
+.mfoot{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--n100)}
+.pick{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--n100);border-radius:var(--r);margin-bottom:6px;cursor:pointer}
+.pick:hover{border-color:var(--blue200);background:#fafcfd}
+.pick.sel{border-color:var(--blue);background:var(--active)}
+.pick .cbx{width:19px;height:19px;border-radius:4px;border:1.6px solid var(--n300);flex:0 0 19px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.pick.sel .cbx{background:var(--blue);border-color:var(--blue)}
+.pick .n{flex:1;font-size:14.5px;font-weight:600}
+.picklist{max-height:330px;overflow-y:auto;margin-top:12px;padding-right:4px}
+
+.qopt{border:1.4px solid var(--n200);border-radius:var(--r);padding:12px 15px;margin-bottom:9px;font-size:14.5px;cursor:pointer;display:flex;gap:11px}
+.qopt:hover{border-color:var(--blue400);background:#fafcfd}
+.qopt.sel{border-color:var(--blue);background:var(--active)}
+.qopt.ok{border-color:var(--grn);background:var(--grn100)}
+.qopt.no{border-color:var(--err);background:#fdeaea}
+.qopt .l{font-weight:700;color:var(--n600);flex:0 0 15px}
+.band{border-radius:var(--rm);padding:20px 22px;margin-bottom:16px}
+.band.ok{background:var(--grn100);border:1px solid #a0e2a9}
+.band.mid{background:var(--yel100);border:1px solid #fbdf72}
+.band.low{background:var(--pink100);border:1px solid #fdadc2}
+.band h2{font-size:21px}
+.wkrow{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--n100)}
+.wkrow:last-child{border-bottom:none}
+.wkrow .nm{flex:0 0 190px;font-size:14px;font-weight:600}
+.wkrow .bar{flex:1}
+.scpill{background:var(--pink100);color:var(--cerise6);border-radius:var(--rp);font-size:12px;font-weight:700;padding:3px 10px;font-family:var(--fu)}
+.scpill.ok{background:var(--grn100);color:var(--grn700)}
+
+.pillbtn{border:1.4px solid var(--n200);color:var(--n700);border-radius:var(--rp);padding:6px 14px;font-size:12.5px;font-weight:600;background:#fff}
+.pillbtn:hover{border-color:var(--blue);color:var(--blue)}
+.pillbtn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.searchwrap{margin-top:12px}
+.searchin{width:100%;border:1px solid var(--n200);border-radius:var(--rp);padding:9px 16px;font-size:14px}
+.searchin:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,112,156,.18)}
+.acc{border:1px solid var(--n100);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.acchead{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;background:#fafbfc}
+.acchead:hover{background:var(--active)}
+.acchead .caret{color:var(--n600);font-size:11px;width:12px}
+.acchead .accname{font-weight:700;font-size:14.5px;flex:1}
+.accbody{padding:8px 10px 10px;border-top:1px solid var(--n100)}
+.accbody .pick{margin-bottom:5px}
+.tip{position:relative;display:inline-block}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);right:0;background:#1d1a22;color:#fff;font-family:var(--fu);font-size:11.5px;line-height:1.4;padding:8px 11px;border-radius:6px;width:230px;opacity:0;pointer-events:none;transition:opacity 140ms;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.tip:hover::after{opacity:1}
+.tip .btn[disabled]{pointer-events:none}
+
+.amenu{position:relative;display:inline-block}
+.amenu>.trig{border:1.4px solid var(--blue);border-radius:var(--rp);padding:6px 14px;display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-size:12.5px;font-weight:600;background:#fff;white-space:nowrap}
+.amenu>.trig:hover{background:var(--active)}
+.amenu>.trig .cv{font-size:9px;opacity:.7}
+.backbtn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--n700);border:1px solid var(--n200);border-radius:var(--rp);padding:6px 14px;background:#fff;margin-bottom:12px}
+.backbtn:hover{border-color:var(--blue);color:var(--blue);background:var(--active)}
+.amenu .pop{position:absolute;right:0;top:34px;background:#fff;border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--shl);min-width:210px;padding:6px;z-index:120}
+.amenu .pop button{display:block;width:100%;text-align:left;padding:9px 11px;border-radius:6px;font-size:13.5px;color:var(--tx)}
+.amenu .pop button:hover{background:var(--active);color:var(--blue)}
+.amenu .pop button[disabled]{color:var(--n300);cursor:not-allowed;background:none}
+.amenu .pop .hint{padding:2px 11px 8px;font-size:11.5px;color:var(--muted);line-height:1.35}
+.menuscrim{position:fixed;inset:0;z-index:110}
+.selectwrap select{width:100%;border:1px solid var(--n200);border-radius:var(--r);padding:10px 12px;font-size:14.5px;background:#fff}
+.selectwrap select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,112,156,.18)}
+.explain{background:var(--infosoft);border-radius:var(--r);padding:11px 14px;font-size:13px;margin-top:10px;line-height:1.45}
+.explain b{font-weight:700}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+<div id="modalroot"></div>
+<div id="devbar"></div>
+<script>
+/* ============================================================
+   TAXONOMY  (global; a Topic is NOT owned by a Class)
+   ============================================================ */
+const TH = {r:["#e8175d","#a3123f"],b:["#1b7ec4","#0d4f80"],v:["#7b3fb3","#4d2172"],o:["#f08c00","#b06400"],
+  t:["#0f9b8e","#08635a"],g:["#4a9d3f","#2c6626"],p:["#d4468c","#8e2a5c"],n:["#3b4d78","#22304d"]};
+
+const CATS = [
+  {id:"medsurg", name:"Med-Surg", topics:[
+    {id:"hf",   n:"Heart failure",              v:"Heart Failure",              d:"14 min", th:"r", q:12},
+    {id:"mi",   n:"Myocardial infarction",      v:"MI & ACS",                   d:"11 min", th:"r", q:10},
+    {id:"copd", n:"COPD",                       v:"COPD",                       d:"9 min",  th:"t", q:8},
+    {id:"asth", n:"Asthma",                     v:"Asthma",                     d:"8 min",  th:"t", q:9},
+    {id:"aki",  n:"Acute kidney injury",        v:"AKI",                        d:"12 min", th:"b", q:8},
+    {id:"dka",  n:"DKA vs HHS",                 v:"DKA vs HHS: Priorities",     d:"14 min", th:"o", q:11},
+    {id:"fe",   n:"Fluid & electrolytes",       v:"Fluid & Electrolytes",       d:"17 min", th:"b", q:14},
+    {id:"seps", n:"Sepsis & shock",             v:"Sepsis",                     d:"10 min", th:"v", q:9}]},
+  {id:"pharm", name:"Pharmacology", topics:[
+    {id:"ahtn", n:"Antihypertensives",          v:"Antihypertensives",          d:"13 min", th:"b", q:12},
+    {id:"card", n:"Cardiac drugs",              v:"Beta Blockers",              d:"11 min", th:"r", q:13},
+    {id:"anti", n:"Anticoagulants",             v:"Anticoagulants",             d:"12 min", th:"v", q:10},
+    {id:"ins",  n:"Insulin drugs",              v:"Insulin",                    d:"15 min", th:"o", q:12},
+    {id:"abx",  n:"Antibiotics",                v:"Antibiotics",                d:"16 min", th:"g", q:11},
+    {id:"opi",  n:"Opioid analgesics",          v:"Opioids",                    d:"10 min", th:"p", q:9},
+    {id:"cort", n:"Corticosteroids",            v:"Corticosteroids",            d:"8 min",  th:"o", q:8},
+    {id:"bron", n:"Bronchodilators",            v:"Bronchodilators",            d:"9 min",  th:"t", q:8}]},
+  {id:"patho", name:"Pathophysiology", topics:[
+    {id:"infl", n:"Inflammation",               v:"Inflammation",               d:"10 min", th:"r", q:9},
+    {id:"cell", n:"Cellular injury",            v:"Cellular Injury",            d:"9 min",  th:"v", q:8},
+    {id:"acid", n:"Acid-base balance",          v:"Acid-Base Balance",          d:"18 min", th:"b", q:14},
+    {id:"immu", n:"Immunity",                   v:"Immunity",                   d:"11 min", th:"g", q:9},
+    {id:"canc", n:"Cancer basics",              v:"Oncology Basics",            d:"13 min", th:"p", q:10},
+    {id:"shk",  n:"Shock states",               v:"Shock",                      d:"12 min", th:"n", q:10}]},
+  {id:"fund", name:"Fundamentals", topics:[
+    {id:"vit",  n:"Vital signs",                v:"Vital Signs",                d:"8 min",  th:"t", q:8},
+    {id:"inf",  n:"Infection control",          v:"Infection Control",          d:"9 min",  th:"g", q:9},
+    {id:"safe", n:"Safety & falls",             v:"Safety & Falls",             d:"7 min",  th:"o", q:8},
+    {id:"mob",  n:"Mobility",                   v:"Mobility & Positioning",     d:"10 min", th:"b", q:8},
+    {id:"wnd",  n:"Wound care",                 v:"Wound Care",                 d:"11 min", th:"p", q:9},
+    {id:"pain", n:"Pain management",            v:"Pain Management",            d:"12 min", th:"r", q:10}]},
+  {id:"mh", name:"Mental Health", topics:[
+    {id:"anx",  n:"Anxiety disorders",          v:"Anxiety Disorders",          d:"10 min", th:"v", q:9},
+    {id:"dep",  n:"Depression",                 v:"Depression",                 d:"11 min", th:"n", q:9},
+    {id:"bip",  n:"Bipolar disorder",           v:"Bipolar",                    d:"10 min", th:"p", q:8},
+    {id:"schz", n:"Schizophrenia",              v:"Schizophrenia",              d:"12 min", th:"v", q:10},
+    {id:"sub",  n:"Substance use",              v:"Substance Use",              d:"13 min", th:"o", q:9},
+    {id:"thpc", n:"Therapeutic communication",  v:"Therapeutic Communication",  d:"9 min",  th:"t", q:8},
+    {id:"adhd", n:"ADHD/ADD",                   v:"ADHD/ADD",                   d:"8 min",  th:"r", q:8}]},
+  {id:"ob", name:"Maternity / OB", topics:[
+    {id:"pren", n:"Prenatal care",              v:"Prenatal Care",              d:"12 min", th:"p", q:10},
+    {id:"labr", n:"Stages of labor",            v:"Stages of Labor",            d:"14 min", th:"r", q:11},
+    {id:"post", n:"Postpartum complications",   v:"Postpartum Complications",   d:"11 min", th:"v", q:9},
+    {id:"fetl", n:"Fetal monitoring",           v:"Fetal Monitoring",           d:"13 min", th:"b", q:10},
+    {id:"newb", n:"Newborn assessment",         v:"Newborn Assessment",         d:"10 min", th:"t", q:9}]},
+  {id:"peds", name:"Pediatrics", topics:[
+    {id:"grow", n:"Growth & development",       v:"Growth & Development",       d:"11 min", th:"g", q:9},
+    {id:"pres", n:"Pediatric respiratory",      v:"Peds Respiratory",           d:"12 min", th:"t", q:10},
+    {id:"chd",  n:"Congenital heart defects",   v:"Congenital Heart Defects",   d:"13 min", th:"r", q:10},
+    {id:"immz", n:"Immunizations",              v:"Immunizations",              d:"8 min",  th:"o", q:8},
+    {id:"dpeds",n:"Diabetes pediatrics",        v:"Diabetes Pediatrics",        d:"10 min", th:"o", q:9}]}
+];
+
+/* Videos that exist in the library but are NOT folded into any topic.
+   This is the orphan-content problem. They can only be attached to a class as Items. */
+const ORPHANS = [
+  {id:"o1", cat:"medsurg", t:"Amputations",                     d:"7 min",  th:"v"},
+  {id:"o2", cat:"medsurg", t:"Metabolic & Respiratory ABG",     d:"15 min", th:"b"},
+  {id:"o3", cat:"pharm",   t:"Dosage calculation: IV drip rates",d:"12 min", th:"g"},
+  {id:"o4", cat:"pharm",   t:"Drug suffixes & mnemonics",       d:"6 min",  th:"o"},
+  {id:"o5", cat:"fund",    t:"Lab values cheat run-through",    d:"18 min", th:"n"},
+  {id:"o6", cat:"mh",      t:"Test-taking: SATA strategy",      d:"9 min",  th:"p"},
+  {id:"o7", cat:"patho",   t:"Nurse Mike's 12 must-know labs",  d:"20 min", th:"b"},
+  {id:"o8", cat:"ob",      t:"Newborn reflexes quick review",   d:"5 min",  th:"t"}
+];
+
+const ALLTOPICS = {};
+CATS.forEach(c => c.topics.forEach(t => { t.cat = c.id; t.catName = c.name; ALLTOPICS[t.id] = t; }));
+const CAT = id => CATS.find(c => c.id === id);
+
+/* Class-name -> category mapping. This is what makes a name-only class useful. */
+const NAMEMAP = [
+  [/med.?surg|medical.?surgical|adult health/i, "medsurg"],
+  [/pharm/i, "pharm"],
+  [/patho|physiology/i, "patho"],
+  [/fundament|foundation|nursing 101|basic/i, "fund"],
+  [/mental|psych|behavior/i, "mh"],
+  [/matern|ob\b|obstet|women|reproduct/i, "ob"],
+  [/peds|pediatric|child/i, "peds"]
+];
+function guessCat(name) {
+  for (const [re, id] of NAMEMAP) if (re.test(name)) return id;
+  return null;
+}
+
+/* ============================================================
+   STATE
+   Class > (Topic enrollments | Items | Exams)
+   A topic enrollment is per-class. Same topic in two classes = two records.
+   ============================================================ */
+var S, R;
+var SEQ = 100;
+const uid = p => p + (++SEQ);
+const TODAY = new Date(2026, 9, 6); // Oct 6 2026, mid Fall semester
+
+function fmt(d) { return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }); }
+function daysTo(d) { return Math.round((d - S.now) / 864e5); }
+
+function blankState() {
+  return {
+    user: { name: "Juli" },
+    now: new Date(TODAY),
+    classes: [], enroll: [], items: [], exams: [], recs: [],
+    watch: [],      // continue watching: {key,title,cat,th,dur,pct,when}
+    jump: [],       // jump back in
+    log: []         // global activity log {classId, topicId, text, when}
+  };
+}
+
+function addClass(name, opts) {
+  opts = opts || {};
+  const c = {
+    id: uid("c"), name,
+    cat: opts.cat !== undefined ? opts.cat : guessCat(name),
+    instructor: opts.instructor || "", ends: opts.ends || null,
+    archived: false, created: opts.created || "Aug 26"
+  };
+  S.classes.push(c); return c;
+}
+function enroll(classId, topicId, o) {
+  o = o || {};
+  const e = {
+    id: uid("e"), classId, topicId,
+    watch: !!o.watch, review: !!o.review, quiz: !!o.quiz,
+    quizScore: o.quizScore === undefined ? null : o.quizScore,
+    quizAnswered: o.quizAnswered || 0, quizCorrect: o.quizCorrect || 0,
+    added: o.added || "Sep 2"
+  };
+  S.enroll.push(e); return e;
+}
+function addItem(classId, kind, title, o) {
+  o = o || {};
+  const i = { id: uid("i"), classId, kind, title, dur: o.dur || "", th: o.th || "b", src: o.src || "manual" };
+  S.items.push(i); return i;
+}
+function addExam(classId, name, date, topicIds, o) {
+  o = o || {};
+  const e = {
+    id: uid("x"), classId, name, date, topicIds: topicIds.slice(),
+    checkpoint: o.checkpoint || null,   // {score, total, correct, perTopic:{tid:{c,t}}, takenOn}
+    result: o.result || null,           // {outcome, grade}
+    past: !!o.past
+  };
+  S.exams.push(e); return e;
+}
+function logIt(classId, topicId, text, when) { S.log.unshift({ classId, topicId, text, when }); }
+
+/* ---- derived ---- */
+const enrollsOf = cid => S.enroll.filter(e => e.classId === cid);
+const itemsOf = cid => S.items.filter(i => i.classId === cid);
+const examsOf = cid => S.exams.filter(e => e.classId === cid);
+const cls = id => S.classes.find(c => c.id === id);
+const topicOf = e => ALLTOPICS[e.topicId];
+const enrById = id => S.enroll.find(e => e.id === id);
+const stepsDone = e => (e.watch ? 1 : 0) + (e.review ? 1 : 0) + (e.quiz ? 1 : 0);
+const eDone = e => stepsDone(e) === 3;
+const eStarted = e => stepsDone(e) > 0;
+const nextExam = cid => examsOf(cid).filter(x => !x.past).sort((a, b) => a.date - b.date)[0] || null;
+function classPct(cid) {
+  const es = enrollsOf(cid); if (!es.length) return 0;
+  return Math.round(es.reduce((s, e) => s + stepsDone(e), 0) / (es.length * 3) * 100);
+}
+function tierOf(cid) {
+  if (examsOf(cid).length) return 3;
+  if (enrollsOf(cid).length) return 2;
+  return 1;
+}
+
+/* ============================================================
+   SCENARIOS
+   ============================================================ */
+function scenario(which) {
+  S = blankState(); SEQ = 100;
+  R = { view: "home", classId: null, enrollId: null, examId: null, modal: null, tab: "current", notes: R ? R.notes : true, scenario: which };
+
+  if (which === "cold") {
+    S.recs = ["fe", "dka", "ahtn", "acid", "pain", "hf"];
+    return;
+  }
+
+  /* --- shared: continue-watching / jump-back-in always exist, no setup needed --- */
+  const seedResume = () => {
+    S.watch = [
+      { key: "hf", title: "Heart Failure", cat: "medsurg", th: "r", dur: "14 min", pct: 62, when: "yesterday" },
+      { key: "adhd", title: "ADHD/ADD", cat: "mh", th: "r", dur: "8 min", pct: 55, when: "2 days ago" },
+      { key: "o1", title: "Amputations", cat: "medsurg", th: "v", dur: "7 min", pct: 30, when: "last week", orphan: true },
+      { key: "acid", title: "Acid-Base Balance", cat: "patho", th: "b", dur: "18 min", pct: 20, when: "last week" },
+      { key: "ins", title: "Insulin", cat: "pharm", th: "o", dur: "15 min", pct: 80, when: "3 days ago" }
+    ];
+    S.jump = [
+      { ico: "Q", t: "Cardiac drugs quiz", m: "8 of 13 questions · started 4 days ago", btn: "Continue quiz" },
+      { ico: "G", t: "Metabolic & Respiratory ABG", m: "Study Guide PDF · opened 2 days ago", btn: "Open" },
+      { ico: "C", t: "Cardio collection", m: "8 items · created 2 weeks ago", btn: "Open" }
+    ];
+  };
+
+  if (which === "browse") {
+    seedResume();
+    addClass("Med Surg I", { instructor: "Prof. J. Whitfield", ends: new Date(2026,11,15), created: "Aug 26" });
+    addClass("Pharmacology II", { instructor: "Prof. R. Alvarez", ends: new Date(2026,11,12), created: "Aug 26" });
+    addClass("Mental Health", { ends: null, created: "Sep 18" });
+    return;
+  }
+
+  /* --- tier 2 and 3 share a class set --- */
+  const ms = addClass("Med Surg I", { instructor: "Prof. J. Whitfield", ends: new Date(2026,11,15), created: "Aug 26" });
+  const ph = addClass("Pharmacology II", { instructor: "Prof. R. Alvarez", ends: new Date(2026,11,12), created: "Aug 26" });
+  const mh = addClass("Mental Health", { ends: null, created: "Sep 18" });
+  seedResume();
+
+  // Pharm II — the deep class
+  enroll(ph.id, "ahtn", { watch: 1, review: 1, quiz: 1, quizScore: 71, quizAnswered: 12, quizCorrect: 9, added: "Sep 2" });
+  enroll(ph.id, "ins", { watch: 1, review: 1, quiz: 1, quizScore: 92, quizAnswered: 12, quizCorrect: 11, added: "Sep 2" });
+  enroll(ph.id, "card", { watch: 1, review: 0, quiz: 0, added: "Sep 20" });
+  enroll(ph.id, "anti", { watch: 0, review: 0, quiz: 0, added: "Sep 20" });
+  enroll(ph.id, "cort", { watch: 1, review: 1, quiz: 0, added: "Sep 28" });
+  addItem(ph.id, "video", "Dosage calculation: IV drip rates", { dur: "12 min", th: "g", src: "orphan" });
+  addItem(ph.id, "video", "Drug suffixes & mnemonics", { dur: "6 min", th: "o", src: "collection" });
+  addItem(ph.id, "guide", "Prof. Alvarez slide deck wk 6", { src: "manual" });
+
+  // Med Surg I
+  enroll(ms.id, "fe", { watch: 1, review: 1, quiz: 1, quizScore: 58, quizAnswered: 14, quizCorrect: 8, added: "Sep 4" });
+  enroll(ms.id, "dka", { watch: 1, review: 0, quiz: 0, added: "Sep 29" });
+  enroll(ms.id, "hf", { watch: 0, review: 0, quiz: 0, added: "Oct 1" });
+  enroll(ms.id, "aki", { watch: 0, review: 0, quiz: 0, added: "Oct 1" });
+  addItem(ms.id, "video", "Metabolic & Respiratory ABG", { dur: "15 min", th: "b", src: "collection" });
+
+  // Mental Health — set up but untouched. The "I made a class and never came back" case.
+  logIt(ph.id, "ahtn", "Quiz: Antihypertensives — 71%", "Sep 9");
+  logIt(ph.id, "ins", "Quiz: Insulin drugs — 92%", "Sep 14");
+  logIt(ms.id, "fe", "Quiz: Fluid & electrolytes — 58%", "Sep 16");
+  logIt(ph.id, "card", "Watched Beta Blockers (11 min)", "Oct 4");
+  logIt(ms.id, "dka", "Watched DKA vs HHS (14 min)", "Oct 5");
+
+  if (which === "topics") return;
+
+  /* --- tier 3: exams --- */
+  if (which === "exam" || which === "postexam") {
+    addExam(ph.id, "Exam 2", new Date(2026, 9, 14), ["card", "anti", "cort"], {});
+    addExam(ph.id, "Exam 1", new Date(2026, 8, 16), ["ahtn", "ins"], {
+      past: true,
+      checkpoint: { correct: 10, total: 12, score: 83, takenOn: "Sep 15", perTopic: { ahtn: { c: 4, t: 6 }, ins: { c: 6, t: 6 } } },
+      result: { outcome: "passed", grade: "88" }
+    });
+    addExam(ms.id, "Exam 2", new Date(2026, 9, 22), ["dka", "hf", "aki"], {});
+  }
+  if (which === "postexam") {
+    // Pharm Exam 2 fully studied, checkpoint taken, exam date passed, result not captured
+    S.enroll.filter(e => e.classId === ph.id && ["card", "anti", "cort"].includes(e.topicId))
+      .forEach(e => { e.watch = e.review = e.quiz = true; e.quizScore = 70; e.quizAnswered = 10; e.quizCorrect = 7; });
+    const x = examsOf(ph.id).find(e => e.name === "Exam 2");
+    x.checkpoint = { correct: 8, total: 12, score: 67, takenOn: "Oct 12",
+      perTopic: { card: { c: 2, t: 5 }, anti: { c: 3, t: 4 }, cort: { c: 3, t: 3 } } };
+    S.now = new Date(2026, 9, 16);
+  }
+}
+/* ============================================================
+   HELPERS + COMPONENTS
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const bg = k => { const c = TH[k] || TH.b; return `background:linear-gradient(135deg,${c[0]},${c[1]})`; };
+const note = () => "";
+const tier = () => "";
+
+function actionMenu(id, items, label) {
+  const open = R.menu === id;
+  return `<div class="amenu">
+    <button class="trig" onclick="R.menu=${open ? "null" : `'${id}'`};render()">${esc(label || "Options")}<span class="cv">▾</span></button>
+    ${open ? `<div class="pop">${items.map(it => it.hint
+      ? `<div class="hint">${it.hint}</div>`
+      : `<button ${it.off ? "disabled" : ""} onclick="R.menu=null;${it.off ? "" : it.fn}">${esc(it.label)}</button>`).join("")}</div>` : ""}
+  </div>`;
+}
+function areaBlurb(catId) {
+  const c = CAT(catId); if (!c) return "";
+  return `<div class="explain">We'll start you with a list of <b>${esc(c.name)}</b> topics to pick from. You can add topics from any other area too, plus any single video or guide you want to keep with this class.</div>`;
+}
+
+function go(view, o) { R = Object.assign(R, { view, modal: null, menu: null }, o || {}); render(); }
+function openModal(t, d) { R.menu = null; R.modal = Object.assign({ t }, d || {}); render(); }
+function closeModal() { R.modal = null; render(); }
+
+/* ---- live resume state ---- */
+const watchedTopic = tid => S.enroll.some(e => e.topicId === tid && e.watch);
+const watchList = () => S.watch.filter(w => !watchedTopic(w.key));
+function jumpRows() {
+  const rows = S.enroll
+    .filter(e => { const n = stepsDone(e); return n > 0 && n < 3; })
+    .map(e => {
+      const tp = topicOf(e), c = cls(e.classId);
+      const next = !e.watch ? ["Watch " + tp.v, "Video · " + tp.d] : !e.review ? ["Open the " + tp.n + " guide", "Study Guide PDF"] : ["Take the " + tp.n + " quiz", tp.q + " questions"];
+      return { ico: !e.watch ? "▶" : !e.review ? "▤" : "?", t: next[0], m: `${c.name} · ${next[1]}`, id: e.id };
+    });
+  return rows.slice(0, 4);
+}
+
+function videoCard(o) {
+  const left = o.pct > 0 && o.pct < 100 ? Math.max(1, Math.round((1 - o.pct / 100) * parseInt(o.dur))) + " min left" : o.dur;
+  return `<div>
+    <div class="thumb" style="${bg(o.th)}">${esc(o.title)}<span class="dur">${esc(o.dur)}</span></div>
+    ${o.pct ? `<div class="bar p" style="margin-top:7px"><i style="width:${o.pct}%"></i></div>` : ""}
+    <div style="margin-top:7px;font-size:14px;font-weight:600;line-height:1.25">${esc(o.title)}</div>
+    <div class="muted" style="margin-top:2px">${o.when ? "Last watched: " + esc(o.when) : esc(o.sub || "")}${left && o.pct ? " · " + left : ""}</div>
+    <button class="btn bo s" style="margin-top:9px" onclick="toast('${o.pct ? "Resuming" : "Playing"} ${esc(o.title)}')">${o.pct ? "Resume video" : "Watch video"}</button>
+  </div>`;
+}
+
+function classRow(c) {
+  const t = tierOf(c.id), es = enrollsOf(c.id), done = es.filter(eDone).length;
+  const x = nextExam(c.id), cat = c.cat ? CAT(c.cat) : null;
+  const p = classPct(c.id);
+  let status, statusCls, right;
+  if (t === 1) { status = "NOT SET UP"; statusCls = "cn"; right = `<span class="muted">No topics yet</span>`; }
+  else {
+    if (x) {
+      const d = daysTo(x.date);
+      status = d < 0 ? "RESULT NEEDED" : d === 0 ? "EXAM TODAY" : `EXAM IN ${d} DAY${d === 1 ? "" : "S"}`;
+      statusCls = d < 0 ? "cy" : "cl";
+    } else { status = done === es.length ? "ALL TOPICS DONE" : "IN PROGRESS"; statusCls = done === es.length ? "cg" : "cp"; }
+    right = `<div style="min-width:190px"><div class="btw" style="font-size:13px;margin-bottom:5px"><span><b>${done} of ${es.length}</b> topics complete</span><span class="muted">${p}%</span></div><div class="bar"><i style="width:${p}%"></i></div></div>`;
+  }
+  return `<div class="tcard ${t === 1 ? "" : done === es.length ? "dn" : "ip"}" style="grid-template-columns:260px 1fr auto">
+    <div class="lead">
+      <span class="chip ${statusCls}" style="align-self:flex-start;margin-bottom:5px">${status}</span>
+      <div class="nm" onclick="go('class',{classId:'${c.id}'})">${esc(c.name)}</div>
+      <div class="muted">${[c.instructor ? esc(c.instructor) : "", cat ? esc(cat.name) : "no area set", c.ends ? "ends " + fmt(c.ends) : ""].filter(Boolean).join(" · ")}</div>
+    </div>
+    <div style="padding:14px 8px;display:flex;align-items:center">${right}</div>
+    <div class="rt">
+      ${x ? `<div style="text-align:right;font-size:12.5px"><div style="font-weight:700">${esc(x.name)}</div><div class="muted">${fmt(x.date)}</div></div>` : ""}
+      <button class="btn bo s" onclick="go('class',{classId:'${c.id}'})">${t === 1 ? "Set up class" : "Open class"}</button>
+    </div></div>`;
+}
+
+/* ============================================================
+   SCREEN — HOME
+   ============================================================ */
+function screenHome() {
+  const cs = S.classes.filter(c => !c.archived);
+  const hasClasses = cs.length > 0;
+  const upcoming = S.exams.filter(e => !e.past).sort((a, b) => a.date - b.date);
+  const cold = !S.watch.length;
+  const wl = watchList(), jr = jumpRows();
+  const recCards = (S.recs || []).map(id => {
+    const t = ALLTOPICS[id];
+    return videoCard({ title: t.v, th: t.th, dur: t.d, pct: 0, sub: t.catName });
+  }).join("");
+
+  return `<div class="main">
+    <div style="margin-bottom:18px">
+      <h1>${cold ? "Welcome!" : "Welcome back!"}</h1>
+      <div class="sub" style="margin-top:4px">${cold ? "Here's a good place to start." : "Pick up where you left off."}</div>
+    </div>
+
+    ${cold ? `
+    <div class="card">
+      <div class="chead"><div><h2>Recommended for you</h2><div class="sub">The topics nursing students hit first.</div></div>
+        <span class="more" onclick="toast('Browse all videos')">Browse all videos →</span></div>
+      <div class="scr">${recCards}</div>
+    </div>`
+    : wl.length ? `
+    <div class="card">
+      <div class="chead"><div><h2>Continue watching</h2><div class="sub">No pressure, your progress is saved.</div></div>
+        <span class="more" onclick="toast('Browse all videos')">Browse all videos →</span></div>
+      <div class="scr">${wl.map(w => videoCard(w)).join("")}</div>
+    </div>` : ""}
+
+    <div class="split">
+      <div>
+        ${jr.length ? `<div class="card">
+          <div class="chead"><div><h2>Jump back in</h2><div class="sub">Unfinished work, most recent first.</div></div></div>
+          ${jr.map(j => `<div class="lrow"><div class="ico">${j.ico}</div><div class="gr"><div class="t">${esc(j.t)}</div><div class="m">${esc(j.m)}</div></div>
+            <button class="btn bo s" onclick="go('topic',{enrollId:'${j.id}'})">Open</button></div>`).join("")}
+        </div>` : ""}
+
+        <div class="card">
+          <div class="chead"><div><h2>My classes</h2><div class="sub">${hasClasses ? "Your semester, organised." : "Group your studying by the classes you're actually taking."}</div></div>
+            ${hasClasses ? `<span class="more" onclick="go('classes')">See all →</span>` : ""}</div>
+          ${hasClasses ? cs.map(c => {
+            const t = tierOf(c.id), es = enrollsOf(c.id), p = classPct(c.id), x = nextExam(c.id);
+            return `<div class="lrow"><div class="ico">${esc(c.name[0])}</div>
+              <div class="gr"><div class="t">${esc(c.name)}</div>
+              <div class="m">${t === 1 ? "Not set up yet" : `${es.filter(eDone).length}/${es.length} topics · ${p}%`}${x ? ` · ${esc(x.name)} ${fmt(x.date)}` : ""}</div></div>
+              <button class="btn bo s" onclick="go('class',{classId:'${c.id}'})">Open</button></div>`;
+          }).join("") + `<button class="btn bt s" style="margin-top:10px" onclick="openModal('addclass',{step:1,d:{}})">+ Add a class</button>`
+          : `<div class="empty"><div class="bg2">No classes yet</div>
+             <div class="sm" style="max-width:470px;margin:0 auto 16px">Add the classes you're taking and we'll pull the right videos, study guides and quiz questions into each one. You'll be able to see what you've finished, what's left, and whether you're ready before each exam.</div>
+             <button class="btn bp" onclick="openModal('addclass',{step:1,d:{}})">Add your first class</button></div>`}
+        </div>
+
+        ${upcoming.length ? `<div class="card">
+          <div class="chead"><div><h2>Next exams</h2><div class="sub">What's coming up across your classes.</div></div>
+            <span class="more" onclick="go('classes')">All classes →</span></div>
+          ${upcoming.map(x => {
+            const c = cls(x.classId), es = enrollsOf(c.id).filter(e => x.topicIds.includes(e.topicId));
+            const nd = es.filter(eDone).length, d = daysTo(x.date), over = d < 0;
+            return `<div class="lrow">
+              <div class="ico">${over ? "?" : d}</div>
+              <div class="gr"><div class="t">${esc(c.name)} · ${esc(x.name)}</div>
+                <div class="m">${over
+                  ? `${fmt(x.date)} · how did it go? Add your result to close it out.`
+                  : `${fmt(x.date)}${d === 0 ? " · today" : ` · in ${d} day${d === 1 ? "" : "s"}`} · ${nd} of ${es.length} topics complete`}</div></div>
+              ${over ? "" : `<div style="width:96px"><div class="bar ${nd === es.length && es.length ? "g" : ""}"><i style="width:${es.length ? nd / es.length * 100 : 0}%"></i></div></div>`}
+              <button class="btn ${over ? "bp" : "bo"} s" onclick="${over ? `openModal('result',{examId:'${x.id}'})` : `go('class',{classId:'${c.id}'})`}">${over ? "Add result" : "Open class"}</button></div>`;
+          }).join("")}
+        </div>` : ""}
+      </div>
+
+      <div>
+        ${cold ? "" : `<div class="card t">
+          <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Recommended next</h2></div>
+          <div class="sm" style="margin-bottom:8px">You watched two Endocrine videos this week.</div>
+          ${[["DKA vs HHS: Priorities", "Video · 14 min"], ["DKA vs HHS", "Study Guide PDF"], ["Endocrine quiz", "10 questions"]]
+            .map(x => `<div class="lrow" style="padding:9px 0"><div class="gr"><div class="t" style="font-size:13.5px">${esc(x[0])}</div><div class="m">${esc(x[1])}</div></div><button class="btn bo s" onclick="toast('Open')">Open</button></div>`).join("")}
+        </div>`}
+        <div class="card t">
+          <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">News &amp; announcements</h2></div>
+          ${[["Your membership renews Dec 2", "Account"], ["New: 120 pharmacology flashcards", "Oct 3"], ["Nursing webinar: NCLEX Q&A", "Oct 9"]].map(x => `<div class="lrow" style="padding:9px 0"><div class="gr"><div class="t" style="font-size:13.5px">${esc(x[0])}</div><div class="m">${esc(x[1])}</div></div></div>`).join("")}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   SCREEN — MY CLASSES
+   ============================================================ */
+function screenClasses() {
+  const tab = R.tab || "current";
+  const cur = S.classes.filter(c => !c.archived), arc = S.classes.filter(c => c.archived);
+  const list = tab === "current" ? cur : arc;
+  const needsSetup = cur.find(c => tierOf(c.id) === 1);
+
+  return `<div class="main">
+    <div class="hero">
+      <div>
+        <h1>Let's get after it.</h1>
+        <div class="sub" style="margin-top:6px;max-width:560px">You're studying <b>${cur.length} class${cur.length === 1 ? "" : "es"}</b> right now. Everything you watch, read and quiz stays here, so when finals and the NCLEX come around you're not starting over.</div>
+        ${needsSetup ? `<div class="banner" style="max-width:560px"><b>${esc(needsSetup.name)}</b> has no topics yet.<span class="cta" onclick="go('class',{classId:'${needsSetup.id}'})">Set it up →</span></div>` : ""}
+      </div>
+      <div class="mike">NURSE MIKE</div>
+    </div>
+
+    <div class="btw" style="margin-bottom:14px">
+      <div class="ptabs" style="border:none;padding:0;margin:0">
+        <div class="${tab === "current" ? "on" : ""}" onclick="R.tab='current';render()">Current ${cur.length}</div>
+        <div class="${tab === "arch" ? "on" : ""}" onclick="R.tab='arch';render()">Archived ${arc.length}</div>
+      </div>
+      <button class="btn bp" onclick="openModal('addclass',{step:1,d:{}})">+ ADD CLASS</button>
+    </div>
+
+    ${list.length ? list.map(classRow).join("") : `<div class="card"><div class="empty"><div class="bg2">${tab === "current" ? "No classes yet" : "Nothing archived"}</div><div class="sm">${tab === "current" ? "Add the classes you're taking this semester." : "When a semester ends, archive the class. Its work stays readable for finals and the NCLEX."}</div></div></div>`}
+  </div>`;
+}
+/* ============================================================
+   SCREEN — CLASS HOME
+   ============================================================ */
+function upNext(pool) {
+  const list = pool.filter(e => !eDone(e));
+  return list.filter(eStarted)[0] || list[0] || null;
+}
+
+function screenClass() {
+  const c = cls(R.classId); if (!c) return `<div class="main"><div class="empty">Class not found.</div></div>`;
+  const t = tierOf(c.id), es = enrollsOf(c.id), cat = c.cat ? CAT(c.cat) : null;
+  const exams = examsOf(c.id).sort((a, b) => a.date - b.date);
+  const up = nextExam(c.id), past = exams.filter(e => e.past);
+  const items = itemsOf(c.id);
+  const examIds = up ? up.topicIds : [];
+  const onExamAll = es.filter(e => examIds.includes(e.topicId));
+  const onExam = onExamAll.filter(e => !eDone(e));
+  const other = es.filter(e => !examIds.includes(e.topicId) && !eDone(e));
+  const done = es.filter(eDone);
+  const nx = upNext(onExamAll.length ? onExamAll : es);
+
+  return `<div class="main">
+    <button class="backbtn" onclick="go('classes')">← My classes</button>
+    <div class="btw" style="align-items:flex-start">
+      <div>
+        <h1>${esc(c.name)}</h1>
+        ${c.instructor || c.ends ? `<div class="sub" style="margin-top:5px">${[c.instructor ? esc(c.instructor) : "", c.ends ? "Ends " + fmt(c.ends) : ""].filter(Boolean).join(" · ")}</div>` : ""}
+      </div>
+      <button class="btn bg s" onclick="openModal('editclass',{d:{name:c.name,cat:c.cat,instructor:c.instructor,ends:c.ends}})">Edit class</button>
+    </div>
+
+    ${t === 1 ? tier1(c, cat) : ""}
+
+    <div class="split" style="margin-top:20px">
+      <div>
+        ${t >= 2 ? examBlock(c, up, onExamAll, onExam, past, nx) : ""}
+        ${t >= 2 && other.length ? topicBlock(c, other, up ? "Other topics in this class" : "Topics in this class", up ? "Not on the next exam. Still tracked." : "Work through these at your own pace.", null, nx) : ""}
+        ${done.length ? topicBlock(c, done, "Completed topics", "Loop closed. Kept for the final and for the NCLEX.", examIds, null) : ""}
+        ${t >= 2 ? quizPerf(c, es) : ""}
+        ${t >= 2 ? itemsBlock(c, items, cat) : ""}
+      </div>
+      <div>
+        ${past.length ? pastExams(past) : ""}
+        ${t >= 2 ? glance(c, es) : ""}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* --- TIER 1 --- */
+function tier1(c, cat) {
+  if (!cat) return `<div class="card stripe" style="margin-top:18px">
+    <div class="chead"><div><h2>What areas does this class cover?</h2><div class="sub">Pick one and this page fills in with the matching videos, guides and quizzes.</div></div></div>
+    <div class="selectwrap" style="max-width:380px"><select onchange="setCat('${c.id}',this.value)">
+      <option value="">Choose an area</option>
+      ${CATS.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join("")}
+    </select></div>
+  </div>`;
+
+  const recs = cat.topics.slice(0, 6);
+  return `<div class="card stripe" style="margin-top:18px">
+    <div class="chead"><div><h2>Start here</h2><div class="sub">Pick the topics you need. Each one gives you a video, a study guide and a quiz, and tracks your progress in this class.</div></div></div>
+    <div class="sm" style="font-weight:700;margin-bottom:9px">Most-studied ${esc(cat.name)} topics</div>
+    <div class="sm" style="margin:-4px 0 10px">Not seeing what's on your syllabus? Browse all topics, or save a single video or guide to this class.</div>
+    ${recs.map(tp => `<div class="pick" onclick="quickAdd('${c.id}','${tp.id}')">
+      <div class="cbx"></div><div class="n">${esc(tp.n)}</div>
+      <span class="btn bt s">Add</span></div>`).join("")}
+    <div class="btw mt">
+      <button class="btn bo s" onclick="openModal('addtopics',{sel:[]})">Browse all topics</button>
+      <button class="btn bg s" onclick="toast('Study guides, filtered to this class')">Study guides</button>
+    </div>
+  </div>`;
+}
+
+/* --- EXAMS --- */
+function examBlock(c, up, onExamAll, onExam, past, nx) {
+  const closed = past.length && !up;
+  if (!up) return `<div class="card stripe-yellow">
+    <div class="chead"><div><h2>Exams</h2><div class="sub">${closed ? "Nothing on the calendar right now." : "Nothing coming up yet."}</div></div></div>
+    <div class="sm" style="margin-bottom:14px">Got an exam coming up? Add it and we'll group the topics it covers, then check whether you're ready before test day.</div>
+    <button class="btn bp s" onclick="openModal('addexam',{d:{ids:[],lib:[]}})">+ Add ${closed ? "your next" : "an"} exam</button></div>`;
+
+  const nDone = onExamAll.filter(eDone).length;
+  const allDone = onExamAll.length && nDone === onExamAll.length;
+  const d = daysTo(up.date);
+  const cp = up.checkpoint;
+  const overdue = d < 0;
+
+  return `<div class="card">
+    <div class="chead">
+      <div><h2>${esc(up.name)} · ${fmt(up.date)}</h2>
+        <div class="sub">${overdue ? "Waiting on your result" : `In ${d} day${d === 1 ? "" : "s"}`} · <b>${nDone} of ${onExamAll.length}</b> topics complete</div></div>
+      ${examMenu(c, up)}
+    </div>
+
+    ${onExam.length ? onExam.map(e => topicCard(e, { isNext: nx && nx.id === e.id })).join("")
+      : onExamAll.length ? `<div class="banner" style="margin-top:0"><b>All ${onExamAll.length} topics complete.</b> They've moved down to Completed topics.</div>`
+      : `<div class="sm">No topics on this exam yet.</div>`}
+
+    <div class="hr"></div>
+    ${cp ? checkpointResult(up, cp) : `
+      <div class="btw">
+        <div><h3>Readiness check</h3><div class="sm">${allDone
+          ? "All topics done. Take a mixed quiz across everything on this exam."
+          : `A mixed quiz across all ${onExamAll.length} topics, so you know where you stand before test day.`}</div></div>
+        ${allDone
+          ? `<button class="btn bp" onclick="go('check',{examId:'${up.id}'})">Start readiness check</button>`
+          : `<span class="tip" data-tip="You haven't finished all your topics yet. You can still take it — we'll show you where you stand."><button class="btn bb" onclick="confirmEarlyCheck('${up.id}')">Start readiness check</button></span>`}
+      </div>`}
+    ${overdue && !up.result ? `<div class="banner w" style="margin-top:14px"><b>Did you take ${esc(up.name)}?</b> Tell us how it went so we can close the loop.<span class="cta" onclick="openModal('result',{examId:'${up.id}'})">Add result →</span></div>` : ""}
+  </div>`;
+}
+
+function examMenu(c, up) {
+  const items = [];
+  if (up) {
+    items.push({ label: "Edit this exam", fn: `openModal('addexam',{d:{id:'${up.id}',name:'${esc(up.name)}',ids:${JSON.stringify(up.topicIds)},lib:[],date:new Date('${up.date.toISOString()}')}})` });
+    items.push({ label: "Add exam result", fn: `openModal('result',{examId:'${up.id}'})` });
+    items.push({ label: "+ Add an exam", off: true });
+    items.push({ hint: `Finish ${esc(up.name)} first. Add its result and the next one opens up.` });
+  } else {
+    items.push({ label: "+ Add an exam", fn: "openModal('addexam',{d:{ids:[],lib:[]}})" });
+  }
+  return actionMenu("exam-" + c.id, items, "Exam options");
+}
+
+function checkpointResult(x, cp) {
+  const band = cp.score >= 75 ? "ok" : cp.score >= 60 ? "mid" : "low";
+  const label = cp.score >= 75 ? "On track" : cp.score >= 60 ? "Almost there" : "Keep studying";
+  const rows = Object.entries(cp.perTopic).map(([tid, v]) => ({ tid, ...v, pc: Math.round(v.c / v.t * 100) }))
+    .sort((a, b) => a.pc - b.pc);
+  return `<div class="band ${band}">
+    <div class="btw"><div><div class="eb" style="color:inherit;opacity:.7">Readiness check · ${esc(cp.takenOn)}</div>
+      <h2 style="margin-top:3px">${label} — ${cp.score}%</h2>
+      <div class="sm" style="margin-top:3px">${cp.correct} of ${cp.total} correct across ${Object.keys(cp.perTopic).length} topics. This is a review check on questions from your topics, not a prediction of your exam score.</div></div>
+      <button class="btn bg s" onclick="go('check',{examId:'${x.id}'})">Retake</button></div>
+  </div>
+  <h3 style="margin-bottom:6px">Where you're weakest</h3>
+  <div class="sm" style="margin-bottom:8px">Ranked by your score inside this exam's topics.</div>
+  ${rows.map(r => r.t < 5
+    ? `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="sm" style="flex:1">Only ${r.t} questions answered. Not enough to rank yet.</div><button class="btn bg s" onclick="toast('More practice')">More practice</button></div>`
+    : `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div>
+       <div class="bar p"><i style="width:${r.pc}%"></i></div>
+       <span class="scpill ${r.pc >= 75 ? "ok" : ""}">${r.pc}%</span>
+       <span class="sm" style="width:110px">${r.c} of ${r.t} questions</span>
+       <button class="btn bo s" onclick="remediate('${x.id}','${r.tid}')">Redo the quiz</button></div>`).join("")}`;
+}
+
+function pastExams(past) {
+  return `<div class="card t">
+    <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Past exams</h2></div>
+    ${past.map(x => `<div class="lrow" style="padding:10px 0"><div class="gr">
+      <div class="t" style="font-size:13.5px">${esc(x.name)} · ${fmt(x.date)}</div>
+      <div class="m">${x.checkpoint ? `Scored ${x.checkpoint.score}% on your readiness check` : "No readiness check taken"}${x.result ? ` · you reported <b>${esc(x.result.grade)}%</b> on the real exam` : " · no result added"}</div>
+    </div>${x.result ? `<span class="chip cg">${esc(x.result.outcome)}</span>` : `<button class="btn bo s" onclick="openModal('result',{examId:'${x.id}'})">Add result</button>`}</div>`).join("")}
+  </div>`;
+}
+
+/* --- TOPIC LISTS --- */
+function topicBlock(c, list, title, sub, examIds, nx) {
+  return `<div class="card">
+    <div class="chead"><div><h2>${esc(title)}</h2><div class="sub">${esc(sub)}</div></div>
+      ${actionMenu("tb-" + title.replace(/\s+/g, ""), [
+        { label: "Add topics", fn: "openModal('addtopics',{sel:[]})" },
+        { label: "Browse the library", fn: "toast('Video lessons, filtered to this class')" }
+      ], "+ Add")}</div>
+    ${list.length ? list.map(e => topicCard(e, { onExam: examIds && examIds.includes(e.topicId), isNext: nx && nx.id === e.id })).join("") : `<div class="sm">Nothing here.</div>`}
+  </div>`;
+}
+
+function nextStepOf(e) {
+  const tp = topicOf(e);
+  if (!e.watch) return { key: "watch", cta: "Watch video", meta: `Next: watch ${tp.v}` };
+  if (!e.review) return { key: "review", cta: "Open guide", meta: "Next: read the study guide" };
+  if (!e.quiz) return { key: "quiz", cta: "Start quiz", meta: `Next: the ${tp.q}-question quiz` };
+  return null;
+}
+function topicCard(e, o) {
+  o = o || {};
+  const tp = topicOf(e), n = stepsDone(e);
+  const st = n === 3 ? "dn" : n > 0 ? "ip" : "";
+  const stat = n === 3 ? "COMPLETE" : n > 0 ? "IN PROGRESS" : "NOT STARTED";
+  const ns = o.isNext ? nextStepOf(e) : null;
+  return `<div class="tcard ${st} ${o.isNext ? "next" : ""}">
+    <div class="lead">
+      <div style="display:flex;gap:6px;margin-bottom:4px">
+        ${o.isNext ? `<span class="chip cb">UP NEXT</span>` : `<span class="chip ${n === 3 ? "cg" : n > 0 ? "cl" : "cn"}">${stat}</span>`}
+        ${o.onExam ? `<span class="chip cl">ON THIS EXAM</span>` : ""}</div>
+      <div class="nm" onclick="go('topic',{enrollId:'${e.id}'})">${esc(tp.n)}</div>
+      <div class="muted">${ns ? esc(ns.meta) : e.quizScore !== null ? `Quiz best ${e.quizScore}%` : `${tp.q} questions available`}</div>
+    </div>
+    <div class="rt">
+      <div class="steps">
+        <span class="step ro ${e.watch ? "dn" : "td"}">WATCH</span>
+        <span class="step ro ${e.review ? "dn" : "td"}">REVIEW</span>
+        <span class="step ro ${e.quiz ? "dn" : "td"}">QUIZ</span>
+      </div>
+      ${ns
+        ? `<button class="btn bp s" onclick="${ns.key === "quiz" ? `go('check',{examId:'topic:${e.id}'})` : `doStep('${e.id}','${ns.key}')`}">${esc(ns.cta)}</button>`
+        : `<button class="btn bo s" onclick="go('topic',{enrollId:'${e.id}'})">Open</button>`}
+    </div></div>`;
+}
+
+function quizPerf(c, es) {
+  const scored = es.filter(e => e.quizScore !== null).sort((a, b) => a.quizScore - b.quizScore);
+  return `<div class="card">
+    <div class="chead"><div><h2>Quiz performance</h2><div class="sub">Everything here comes from questions you answered inside <b>${esc(c.name)}</b>.</div></div>
+      ${actionMenu("qp-" + c.id, [
+        { label: "Build a quiz from this class", fn: `toast('Quiz builder, pre-filtered to ${esc(c.name)}')` },
+        { label: "See all your quiz results", fn: "toast('Quiz insights')" }
+      ], "Options")}</div>
+    ${scored.length ? `
+      <h3 style="margin-bottom:4px">Performance by topic</h3>
+      <div class="sm" style="margin-bottom:9px">Where you are strong and where you are not, inside this class.</div>
+      ${scored.map(e => `<div class="wkrow"><div class="nm">${esc(topicOf(e).n)}</div>
+        <div class="bar ${e.quizScore >= 75 ? "g" : "p"}"><i style="width:${e.quizScore}%"></i></div>
+        <span class="scpill ${e.quizScore >= 75 ? "ok" : ""}">${e.quizScore}%</span>
+        <span class="sm" style="width:110px">${e.quizCorrect} of ${e.quizAnswered} questions</span>
+        <button class="btn bo s" onclick="go('topic',{enrollId:'${e.id}'})">Open topic</button></div>`).join("")}
+    ` : `<div class="sm">No quizzes taken in this class yet. Take a topic quiz and your scores show up here.</div>`}
+  </div>`;
+}
+
+function itemsBlock(c, items, cat) {
+  return `<div class="card">
+    <div class="chead"><div><h2>Extras</h2><div class="sub">Anything else you want to keep with this class.</div></div>
+      ${actionMenu("it-" + c.id, [{ label: "Add a video or guide", fn: "openModal('additem')" }], "+ Add")}</div>
+    ${items.length ? items.map(i => `<div class="lrow"><div class="ico">${i.kind === "video" ? "▶" : "▤"}</div>
+      <div class="gr"><div class="t">${esc(i.title)}</div><div class="m">${i.kind === "video" ? "Video · " + esc(i.dur) : "Study guide"}</div></div>
+      <button class="btn bo s" onclick="toast('Open')">Open</button></div>`).join("")
+      : `<div class="sm">Nothing here yet. Videos, guides and files you save to this class show up here.</div>`}
+  </div>`;
+}
+
+function glance(c, es) {
+  const q = es.filter(e => e.quiz).length, w = es.filter(e => e.watch).length;
+  const sc = es.filter(e => e.quizScore !== null);
+  const avg = sc.length ? Math.round(sc.reduce((s, e) => s + e.quizScore, 0) / sc.length) : null;
+  return `<div class="card t">
+    <div class="chead" style="margin-bottom:6px"><h2 style="font-size:16px">This class at a glance</h2></div>
+    <div class="kv"><span>Topics tracked</span><b>${es.length}</b></div>
+    <div class="kv"><span>Videos watched</span><b>${w}</b></div>
+    <div class="kv"><span>Quizzes taken</span><b>${q}</b></div>
+    <div class="kv"><span>Avg quiz score</span><b>${avg === null ? "—" : avg + "%"}</b></div>
+  </div>`;
+}
+
+/* ============================================================
+   SCREEN — TOPIC HOME
+   ============================================================ */
+function screenTopic() {
+  const e = enrById(R.enrollId); if (!e) return `<div class="main"><div class="empty">Not found.</div></div>`;
+  const tp = topicOf(e), c = cls(e.classId), n = stepsDone(e);
+  const x = examsOf(c.id).find(z => z.topicIds.includes(e.topicId) && !z.past);
+  const sibs = enrollsOf(c.id), i = sibs.findIndex(z => z.id === e.id);
+  const others = S.enroll.filter(z => z.topicId === e.topicId && z.classId !== e.classId);
+
+  const step = (key, label, title, meta, cta) => `
+    <div class="tcard ${e[key] ? "dn" : ""}" style="grid-template-columns:120px 1fr auto">
+      <div class="lead" style="justify-content:center"><span class="chip ${e[key] ? "cg" : "cl"}">${label}</span></div>
+      <div style="padding:14px 4px"><div style="font-weight:700;font-size:15px">${esc(title)}</div><div class="muted">${esc(meta)}</div></div>
+      <div class="rt"><button class="btn ${e[key] ? "bg" : "bb"} s" onclick="${key === "quiz" ? `go('check',{examId:'topic:${e.id}'})` : `doStep('${e.id}','${key}')`}">${e[key] ? (key === "quiz" ? "Retake quiz" : key === "watch" ? "Watch again" : "Open again") : cta}</button></div>
+    </div>`;
+
+  return `<div class="main">
+    <button class="backbtn" onclick="go('class',{classId:'${c.id}'})">← ${esc(c.name)}</button>
+    <div class="btw" style="align-items:flex-start">
+      <div>
+        <div class="eb">${esc(c.name)}${x ? ` · on ${esc(x.name)}` : ""}</div>
+        <h1 style="margin-top:4px">${esc(tp.n)}</h1>
+        <div class="sub" style="margin-top:5px">${n} of 3 steps done${e.quizScore !== null ? ` · quiz best ${e.quizScore}%` : ""}${x ? ` · exam ${fmt(x.date)}` : ""}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${i > 0 ? `<button class="btn bg s" onclick="go('topic',{enrollId:'${sibs[i - 1].id}'})">← Previous</button>` : ""}
+        ${i < sibs.length - 1 ? `<button class="btn bg s" onclick="go('topic',{enrollId:'${sibs[i + 1].id}'})">Next →</button>` : ""}
+      </div>
+    </div>
+
+    <div class="split" style="margin-top:18px">
+      <div>
+        <div class="card">
+          <div class="chead"><div><h2>${n === 3 ? "You're done with this topic" : "Work through it"}</h2><div class="sub">Watch, review, quiz. Nothing here is gated on a score.</div></div></div>
+          ${step("watch", "WATCH", tp.v, `Video · ${tp.d}`, "Watch video")}
+          ${step("review", "REVIEW", tp.n + " study guide", "Study Guide PDF", "Open guide")}
+          ${step("quiz", "QUIZ", tp.n + " quiz", `${tp.q} questions`, "Start quiz")}
+        </div>
+
+        ${others.length ? `<div class="card stripe-yellow">
+          <div class="chead"><div><h2>You've studied this topic before</h2><div class="sub">Same topic, different class. Kept separate on purpose.</div></div></div>
+          ${others.map(o => { const oc = cls(o.classId); return `<div class="lrow"><div class="ico">${esc(oc.name[0])}</div>
+            <div class="gr"><div class="t">${esc(oc.name)}</div><div class="m">${stepsDone(o)} of 3 steps${o.quizScore !== null ? ` · quiz best ${o.quizScore}%` : ""} · added ${esc(o.added)}</div></div>
+            <button class="btn bo s" onclick="go('topic',{enrollId:'${o.id}'})">See that work</button></div>`; }).join("")}
+        </div>` : ""}
+
+        <div class="card">
+          <div class="chead"><div><h2>More on ${esc(tp.n)}</h2><div class="sub">Extra material on this topic, beyond the three steps above.</div></div></div>
+          ${[["Nurse Mike cram session: " + tp.catName, "Video · 22 min"],
+             [tp.n + " flashcards", "48 cards"],
+             [tp.catName + " lab values sheet", "Study Guide PDF"]]
+            .map(r => `<div class="lrow"><div class="ico">▶</div><div class="gr"><div class="t">${esc(r[0])}</div><div class="m">${esc(r[1])}</div></div><button class="btn bo s" onclick="toast('Open')">Open</button></div>`).join("")}
+        </div>
+      </div>
+
+      <div>
+        <div class="card t">
+          <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Progress</h2></div>
+          <div class="seg mb">${["watch", "review", "quiz"].map(k => `<span class="${e[k] ? "d" : ""}"></span>`).join("")}</div>
+          <div class="kv"><span>Steps</span><b>${n} of 3</b></div>
+          <div class="kv"><span>Quiz best</span><b>${e.quizScore === null ? "—" : e.quizScore + "%"}</b></div>
+          <div class="kv"><span>Added</span><b>${esc(e.added)}</b></div>
+          <div style="margin-top:12px"><button class="btn bg s" style="width:100%" onclick="removeEnroll('${e.id}')">Remove from ${esc(c.name)}</button></div>
+        </div>
+        <div class="card t">
+          <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Topic log</h2></div>
+          ${S.log.filter(l => l.classId === c.id && l.topicId === e.topicId).map(l => `<div class="logrow"><div class="d"></div><div><div>${esc(l.text)}</div><div class="m">${esc(l.when)}</div></div></div>`).join("") || `<div class="sm">Nothing yet.</div>`}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+/* ============================================================
+   CHECKPOINT / QUIZ RUNNER
+   ============================================================ */
+const STEMS = [
+  ["A client is prescribed {T}. Which finding requires immediate follow-up?", ["Blood pressure 138/86", "Heart rate 44 and irregular", "Reports mild headache", "Urine output 45 mL/hr"], 1],
+  ["Which statement about {T} indicates the client understands teaching?", ["\"I'll stop as soon as I feel better.\"", "\"I'll double the dose if I miss one.\"", "\"I'll call before taking anything new.\"", "\"I'll skip it on days I feel fine.\""], 2],
+  ["The nurse is planning care related to {T}. Which action is the priority?", ["Document the finding", "Assess airway and breathing", "Notify the family", "Reposition the client"], 1],
+  ["Which lab result is most concerning for a client with {T}?", ["Potassium 5.9 mEq/L", "Sodium 140 mEq/L", "Hemoglobin 13 g/dL", "Glucose 96 mg/dL"], 0],
+  ["A client with {T} reports new symptoms. What should the nurse do first?", ["Administer a PRN medication", "Reassess vital signs", "Chart the complaint", "Call the provider"], 1]
+];
+function buildQuiz(topicIds, n) {
+  const qs = [];
+  let i = 0;
+  while (qs.length < n) {
+    const tid = topicIds[qs.length % topicIds.length];
+    const s = STEMS[i % STEMS.length];
+    qs.push({ tid, q: s[0].replace("{T}", ALLTOPICS[tid].n.toLowerCase()), opts: s[1], a: s[2] });
+    i++;
+  }
+  return qs;
+}
+
+function screenCheck() {
+  const isTopic = String(R.examId).startsWith("topic:");
+  let title, sub, topicIds, backTo, x = null, e = null;
+  if (isTopic) {
+    e = enrById(R.examId.split(":")[1]); const tp = topicOf(e);
+    title = tp.n + " quiz"; sub = `A short quiz drawn from this topic's bank.`; topicIds = [e.topicId];
+    backTo = `go('topic',{enrollId:'${e.id}'})`;
+  } else {
+    x = S.exams.find(z => z.id === R.examId); const c = cls(x.classId);
+    title = `${x.name} readiness check`; sub = `A mixed quiz across all ${x.topicIds.length} topics on this exam.`;
+    topicIds = x.topicIds; backTo = `go('class',{classId:'${c.id}'})`;
+  }
+
+  if (!R.quiz) R.quiz = { qs: buildQuiz(topicIds, isTopic ? 6 : 15), i: 0, ans: [], done: false };
+  const Q = R.quiz;
+
+  if (Q.done) return quizResults(Q, x, e, backTo, isTopic);
+
+  const q = Q.qs[Q.i], picked = Q.ans[Q.i];
+  return `<div class="main" style="max-width:800px">
+    <div class="crumb"><a onclick="R.quiz=null;${backTo}">← Back</a></div>
+    <h1>${esc(title)}</h1>
+    <div class="sub" style="margin-top:4px">${esc(sub)}</div>
+    ${!isTopic ? note(`<b>Question sourcing, option 3.</b> Pooled from the same banks the student already worked through inside these topics, so some will repeat. The copy has to say that out loud or the score over-reports readiness. Reserved holdout sets or Rubi Practice generation are the two real fixes; both are dependencies you do not control yet.`) : ""}
+    <div class="card" style="margin-top:16px">
+      <div class="btw mb"><div class="eb">Question ${Q.i + 1} of ${Q.qs.length}</div><div class="sm">${esc(ALLTOPICS[q.tid].n)}</div></div>
+      <div class="bar mb"><i style="width:${(Q.i + 1) / Q.qs.length * 100}%"></i></div>
+      <div style="font-size:16.5px;font-weight:600;margin:14px 0 14px">${esc(q.q)}</div>
+      ${q.opts.map((o, i) => `<div class="qopt ${picked === i ? "sel" : ""}" onclick="pick(${i})"><span class="l">${"ABCD"[i]}</span><span>${esc(o)}</span></div>`).join("")}
+      <div class="mfoot">
+        <button class="btn bt" style="margin-right:auto" onclick="saveExit()">Save and exit</button>
+        ${Q.i > 0 ? `<button class="btn bg" onclick="R.quiz.i--;render()">Back</button>` : ""}
+        <button class="btn bp" ${picked === undefined ? "disabled" : ""} onclick="nextQ()">${Q.i === Q.qs.length - 1 ? "Finish" : "Next"}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function quizResults(Q, x, e, backTo, isTopic) {
+  const per = {};
+  Q.qs.forEach((q, i) => {
+    per[q.tid] = per[q.tid] || { c: 0, t: 0 };
+    per[q.tid].t++; if (Q.ans[i] === q.a) per[q.tid].c++;
+  });
+  const correct = Q.qs.filter((q, i) => Q.ans[i] === q.a).length;
+  const score = Math.round(correct / Q.qs.length * 100);
+  const band = score >= 75 ? "ok" : score >= 60 ? "mid" : "low";
+  const label = score >= 75 ? "On track" : score >= 60 ? "Almost there" : "Keep studying";
+
+  if (!Q.saved) {
+    Q.saved = true;
+    if (isTopic) { e.quiz = true; e.quizScore = score; e.quizAnswered = Q.qs.length; e.quizCorrect = correct;
+      logIt(e.classId, e.topicId, `Quiz: ${topicOf(e).n} — ${score}%`, "today"); }
+    else { x.checkpoint = { correct, total: Q.qs.length, score, takenOn: "today", perTopic: per };
+      logIt(x.classId, null, `Readiness check: ${x.name} — ${score}%`, "today"); }
+  }
+
+  return `<div class="main" style="max-width:800px">
+    <div class="crumb"><a onclick="R.quiz=null;${backTo}">← Back</a></div>
+    <div class="band ${band}">
+      <div class="eb" style="color:inherit;opacity:.7">${isTopic ? "Topic quiz" : "Readiness check"}</div>
+      <h2 style="margin-top:4px">${label} — ${score}%</h2>
+      <div class="sm" style="margin-top:4px">${correct} of ${Q.qs.length} correct.${isTopic ? "" : " This is a review check on questions from your topics, not a prediction of your exam score."}</div>
+    </div>
+    ${!isTopic ? `
+      <div class="card">
+        <div class="chead"><div><h2>Where you're weakest</h2><div class="sub">Ranked across this exam's topics.</div></div></div>
+        ${Object.entries(per).map(([tid, v]) => ({ tid, ...v, pc: Math.round(v.c / v.t * 100) })).sort((a, b) => a.pc - b.pc).map(r =>
+          r.t < 5
+          ? `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="sm" style="flex:1">Only ${r.t} questions answered. Not enough to rank yet.</div></div>`
+          : `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="bar p"><i style="width:${r.pc}%"></i></div>
+             <span class="scpill ${r.pc >= 75 ? "ok" : ""}">${r.pc}%</span><span class="sm" style="width:110px">${r.c} of ${r.t}</span>
+             <button class="btn bo s" onclick="R.quiz=null;remediate('${x.id}','${r.tid}')">Restudy topic</button></div>`).join("")}
+        ${note(`Five-question floor enforced. This check is 15 questions, so three topics land at exactly five each. Add a fourth topic and every one of them drops under the floor and becomes unrankable. That is a hard constraint on the readiness check length, and it is the strongest argument for a deeper bank or generated questions.`)}
+      </div>` : ""}
+    <div class="card">
+      <div class="chead"><div><h2>Review your answers</h2><div class="sub">Every question, with the right answer and why.</div></div></div>
+      ${Q.qs.map((q, i) => {
+        const right = Q.ans[i] === q.a;
+        return `<div class="lrow" style="align-items:flex-start">
+          <div class="ico" style="background:${right ? "var(--grn100)" : "#fdeaea"};color:${right ? "var(--grn700)" : "var(--err)"}">${right ? "✓" : "✕"}</div>
+          <div class="gr"><div class="t" style="white-space:normal">${esc(q.q)}</div>
+            <div class="m">${esc(ALLTOPICS[q.tid].n)} · ${right ? "you got this right" : `you picked ${"ABCD"[Q.ans[i]]} · correct answer is ${"ABCD"[q.a]}, ${esc(q.opts[q.a])}`}</div></div>
+          ${right ? "" : `<button class="btn bo s" onclick="toast('Rationale + the video moment that explains it')">See insights</button>`}
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="row"><button class="btn bo" onclick="R.quiz=null;${backTo}">Back to ${isTopic ? "topic" : "class"}</button>
+      <button class="btn bg" onclick="R.quiz=null;render()">Retake</button></div>
+  </div>`;
+}
+
+function pick(i) { R.quiz.ans[R.quiz.i] = i; render(); }
+function saveExit() {
+  const isTopic = String(R.examId).startsWith("topic:");
+  R.quiz = null;
+  toast("Saved. Pick it up where you left off.");
+  if (isTopic) go("topic", { enrollId: R.examId.split(":")[1] });
+  else { const x = S.exams.find(z => z.id === R.examId); go("class", { classId: x.classId }); }
+}
+function doStep(id, k) {
+  const e = enrById(id), tp = topicOf(e);
+  if (!e[k]) {
+    e[k] = true;
+    logIt(e.classId, e.topicId, `${k === "watch" ? "Watched " + tp.v : "Opened the " + tp.n + " guide"}`, "today");
+    toast(k === "watch" ? "Video finished. Marked done." : "Guide read. Marked done.");
+  } else {
+    toast(k === "watch" ? "Playing " + tp.v : "Opening the guide");
+  }
+  render();
+}
+function confirmEarlyCheck(xid) {
+  R.confirm = {
+    title: "You haven't finished all your topics yet",
+    body: "The readiness check mixes questions from every topic on this exam, so your score will look worse than it should if some are untouched. Take it anyway?",
+    yes: "Take it anyway", fn: `go('check',{examId:'${xid}'})`
+  };
+  render();
+}
+function nextQ() { if (R.quiz.i === R.quiz.qs.length - 1) R.quiz.done = true; else R.quiz.i++; render(); }
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+function quickAdd(cid, tid) {
+  if (S.enroll.some(e => e.classId === cid && e.topicId === tid)) return toast("Already in this class");
+  enroll(cid, tid, { added: "today" }); toast("Added " + ALLTOPICS[tid].n); render();
+}
+function removeEnroll(id) {
+  const e = enrById(id), cid = e.classId;
+  S.exams.forEach(x => x.topicIds = x.topicIds.filter(t => t !== e.topicId));
+  S.enroll = S.enroll.filter(z => z.id !== id);
+  go("class", { classId: cid });
+}
+function setCat(cid, cat) { cls(cid).cat = cat; render(); }
+function remediate(xid, tid) {
+  const x = S.exams.find(z => z.id === xid);
+  const e = S.enroll.find(z => z.classId === x.classId && z.topicId === tid);
+  if (e) { e.quiz = false; e.quizScore = null; }
+  logIt(x.classId, tid, `Redoing the ${ALLTOPICS[tid].n} quiz after the readiness check`, "today");
+  toast(ALLTOPICS[tid].n + " quiz reset. Your video and guide stay done.");
+  go("class", { classId: x.classId });
+}
+let toastT;
+function toast(msg) {
+  let el = document.getElementById("toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast";
+    el.style.cssText = "position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1d1a22;color:#fff;padding:10px 18px;border-radius:9999px;font-size:13px;font-family:Inter,sans-serif;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,.3)";
+    document.body.appendChild(el); }
+  el.textContent = msg; el.style.opacity = "1";
+  clearTimeout(toastT); toastT = setTimeout(() => el.style.opacity = "0", 1900);
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+function modalWrap(inner, w) { return `<div class="scrim" onclick="if(event.target===this)closeModal()"><div class="modal ${w ? "w" : ""}">${inner}</div></div>`; }
+const dstr = d => d ? new Date(d).toISOString().slice(0, 10) : "";
+
+/* ---------- category picker used in a few places ---------- */
+function catPicker(current, onpick) {
+  return `<div class="row" style="gap:7px;margin-top:8px">${CATS.map(x =>
+    `<button class="pillbtn ${current === x.id ? "sel" : ""}" onclick="${onpick}('${x.id}')">${esc(x.name)}</button>`).join("")}</div>`;
+}
+
+/* ============================================================
+   ADD CLASS
+   ============================================================ */
+function modalAddClass() {
+  const m = R.modal, d = m.d;
+  if (m.step === 1) {
+    if (d.name && d.cat === undefined) d.cat = guessCat(d.name);
+    const auto = d.name ? guessCat(d.name) : null;
+        return modalWrap(`
+      <h2>Add a class</h2>
+      <div class="sub">Name it the way your school does. That's all we need.</div>
+      <div class="field"><label>Class name</label>
+        <input id="f_name" value="${esc(d.name || "")}" placeholder="e.g. Med Surg I"
+          oninput="R.modal.d.name=this.value;R.modal.d.cat=guessCat(this.value);R.modal.d.picking=false;render()" autofocus></div>
+
+      ${d.name ? `<div class="field">
+        <label>What areas does this class cover?</label>
+        <div class="selectwrap"><select onchange="pickClassCat(this.value)">
+          <option value="">Choose an area</option>
+          ${CATS.map(x => `<option value="${x.id}" ${d.cat === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}
+        </select></div>
+        <div class="sm" style="margin-top:6px">${d.cat && auto === d.cat ? "Pre-filled from the class name. Change it if that's not right." : d.cat ? "" : "We couldn't tell from the name, so pick the closest area."}</div>
+        ${d.cat ? areaBlurb(d.cat) : ""}
+      </div>` : ""}
+
+      <div class="row" style="gap:14px">
+        <div class="field" style="flex:1"><label>Instructor <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+          <input value="${esc(d.instructor || "")}" oninput="R.modal.d.instructor=this.value" placeholder="Prof. Alvarez"></div>
+        <div class="field" style="flex:1"><label>Class ends <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+          <input type="date" value="${dstr(d.ends)}" onchange="R.modal.d.ends=this.value?new Date(this.value+'T12:00:00'):null"></div>
+      </div>
+
+      <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
+        <button class="btn bp" ${d.name && d.cat ? "" : "disabled"} onclick="R.modal.step=2;render()">Continue</button></div>`);
+  }
+
+  const sel = d.sel || [];
+  R.modal.open = R.modal.open || {};
+  return modalWrap(`
+    <h2>Which topics do you need?</h2>
+    <div class="sub">Pick the ones on your syllabus. Each gives you a video, a study guide and a quiz, tracked inside ${esc(d.name)}. You can skip this and add them later.</div>
+    ${topicBrowser({ sel, have: [], q: R.modal.q, open: R.modal.open, onToggle: "togSel", primaryCat: d.cat })}
+    <div class="mfoot"><button class="btn bg" onclick="R.modal.step=1;R.modal.q='';render()">Back</button>
+      <button class="btn bo" onclick="createClass(false)">Create without topics</button>
+      <button class="btn bp" ${sel.length ? "" : "disabled"} onclick="createClass(true)">Add ${sel.length || ""} topic${sel.length === 1 ? "" : "s"}</button></div>`, true);
+}
+function pickClassCat(id) { R.modal.d.cat = id; R.modal.d.picking = false; render(); }
+function togSel(tid) {
+  const d = R.modal.d; d.sel = d.sel || [];
+  d.sel = d.sel.includes(tid) ? d.sel.filter(x => x !== tid) : d.sel.concat(tid);
+  render();
+}
+function createClass(withTopics) {
+  const d = R.modal.d;
+  const c = addClass(d.name, { cat: d.cat, instructor: d.instructor, ends: d.ends || null, created: "today" });
+  if (withTopics && d.sel) d.sel.forEach(t => enroll(c.id, t, { added: "today" }));
+  go("class", { classId: c.id });
+}
+
+/* ============================================================
+   TOPIC BROWSER — shared by Add topics and Add exam
+   ============================================================ */
+function topicBrowser(o) {
+  // o: {sel[], have[], q, open{}, onToggle, primaryCat}
+  R.modal.primaryCat = o.primaryCat || null;
+  const q = (o.q || "").trim().toLowerCase();
+  const cats = o.primaryCat ? [CAT(o.primaryCat)].concat(CATS.filter(c => c.id !== o.primaryCat)) : CATS;
+  const body = cats.map(c => {
+    const hits = c.topics.filter(t => !q || t.n.toLowerCase().includes(q) || t.v.toLowerCase().includes(q));
+    if (!hits.length) return "";
+    const open = q ? true : (o.open[c.id] !== undefined ? o.open[c.id] : c.id === o.primaryCat);
+    const nsel = c.topics.filter(t => o.sel.includes(t.id)).length;
+    return `<div class="acc">
+      <div class="acchead" onclick="toggleAcc('${c.id}')">
+        <span class="caret">${open ? "▾" : "▸"}</span>
+        <span class="accname">${esc(c.name)}</span>
+        <span class="sm">${hits.length} topic${hits.length === 1 ? "" : "s"}</span>
+        ${nsel ? `<span class="chip cl">${nsel} selected</span>` : ""}
+      </div>
+      ${open ? `<div class="accbody">${hits.map(t => {
+        const has = o.have.includes(t.id);
+        return has
+          ? `<div class="pick" style="opacity:.45;cursor:default"><div class="cbx">✓</div><div class="n">${esc(t.n)}</div><div class="sm">already added</div></div>`
+          : `<div class="pick ${o.sel.includes(t.id) ? "sel" : ""}" onclick="${o.onToggle}('${t.id}')">
+             <div class="cbx">${o.sel.includes(t.id) ? "✓" : ""}</div>
+             <div class="n">${esc(t.n)}</div>
+             </div>`;
+      }).join("")}</div>` : ""}
+    </div>`;
+  }).join("");
+  return `<div class="searchwrap"><input class="searchin" placeholder="Search topics" value="${esc(o.q || "")}" oninput="R.modal.q=this.value;render()"></div>
+    <div class="picklist">${body || `<div class="sm" style="padding:14px">No topics match "${esc(o.q)}".</div>`}</div>`;
+}
+function toggleAcc(cid) {
+  R.modal.open = R.modal.open || {};
+  const cur = R.modal.open[cid] !== undefined ? R.modal.open[cid] : cid === R.modal.primaryCat;
+  R.modal.open[cid] = !cur; render();
+}
+
+/* ============================================================
+   ADD TOPICS
+   ============================================================ */
+function modalAddTopics() {
+  const c = cls(R.classId);
+  const sel = R.modal.sel || [], have = enrollsOf(c.id).map(e => e.topicId);
+  R.modal.open = R.modal.open || {};
+  return modalWrap(`
+    <h2>Add topics to ${esc(c.name)}</h2>
+    <div class="sub">Your class's category is open first. A class isn't limited to one category.</div>
+    ${topicBrowser({ sel, have, q: R.modal.q, open: R.modal.open, onToggle: "togAdd", primaryCat: c.cat })}
+    <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
+      <button class="btn bp" ${sel.length ? "" : "disabled"} onclick="doAddTopics()">Add ${sel.length || ""}</button></div>`, true);
+}
+function togAdd(tid) {
+  R.modal.sel = R.modal.sel || [];
+  R.modal.sel = R.modal.sel.includes(tid) ? R.modal.sel.filter(x => x !== tid) : R.modal.sel.concat(tid);
+  render();
+}
+function doAddTopics() {
+  (R.modal.sel || []).forEach(t => enroll(R.classId, t, { added: "today" }));
+  toast(R.modal.sel.length + " topic" + (R.modal.sel.length === 1 ? "" : "s") + " added"); closeModal();
+}
+
+/* ============================================================
+   ADD EXAM
+   ============================================================ */
+function modalAddExam() {
+  const c = cls(R.classId), d = R.modal.d, es = enrollsOf(c.id);
+  const ids = d.ids || [], lib = d.lib || [];
+  R.modal.open = R.modal.open || {};
+  const total = ids.length + lib.length;
+  const mode = R.modal.mode || "class";
+
+  return modalWrap(`
+    <h2>${d.id ? "Edit exam" : "Add an exam"}</h2>
+    <div class="sub">${esc(c.name)} · an exam groups the topics it covers and unlocks the readiness check.</div>
+    <div class="row" style="gap:14px">
+      <div class="field" style="flex:1"><label>Exam name</label><input value="${esc(d.name || "")}" oninput="R.modal.d.name=this.value" placeholder="Exam 2" autofocus></div>
+      <div class="field" style="flex:1"><label>Date</label><input type="date" value="${dstr(d.date)}" onchange="R.modal.d.date=this.value?new Date(this.value+'T12:00:00'):null;render()"></div>
+    </div>
+
+    <div class="field"><label>Topics on this exam ${total ? `<span style="color:var(--blue)">· ${total} selected</span>` : ""}</label></div>
+    <div class="ptabs" style="border-bottom:1px solid var(--bd);padding:0;margin-bottom:10px">
+      <div class="${mode === "class" ? "on" : ""}" onclick="R.modal.mode='class';render()">IN THIS CLASS ${es.length}</div>
+      <div class="${mode === "lib" ? "on" : ""}" onclick="R.modal.mode='lib';render()">ADD FROM LIBRARY${lib.length ? " " + lib.length : ""}</div>
+    </div>
+
+    ${mode === "class"
+      ? (es.length ? `<div class="picklist" style="max-height:260px">${es.map(e => `<div class="pick ${ids.includes(e.topicId) ? "sel" : ""}" onclick="togExam('${e.topicId}')">
+          <div class="cbx">${ids.includes(e.topicId) ? "✓" : ""}</div><div class="n">${esc(topicOf(e).n)}</div>
+          <div class="sm">${stepsDone(e)}/3 done</div></div>`).join("")}</div>`
+        : `<div class="sm" style="padding:12px 0">No topics in this class yet. Add some from the library tab.</div>`)
+      : `<div class="sm" style="margin-bottom:6px">Anything you pick here gets added to ${esc(c.name)} as well.</div>
+         ${topicBrowser({ sel: lib, have: es.map(e => e.topicId), q: R.modal.q, open: R.modal.open, onToggle: "togExamLib", primaryCat: c.cat })}`}
+
+    <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
+      <button class="btn bp" ${d.name && d.date && total ? "" : "disabled"} onclick="saveExam()">${d.id ? "Save" : "Add exam"}</button></div>`, true);
+}
+function togExam(tid) {
+  const d = R.modal.d; d.ids = d.ids || [];
+  d.ids = d.ids.includes(tid) ? d.ids.filter(x => x !== tid) : d.ids.concat(tid);
+  render();
+}
+function togExamLib(tid) {
+  const d = R.modal.d; d.lib = d.lib || [];
+  d.lib = d.lib.includes(tid) ? d.lib.filter(x => x !== tid) : d.lib.concat(tid);
+  render();
+}
+function saveExam() {
+  const d = R.modal.d;
+  (d.lib || []).forEach(t => { if (!S.enroll.some(e => e.classId === R.classId && e.topicId === t)) enroll(R.classId, t, { added: "today" }); });
+  const all = (d.ids || []).concat(d.lib || []);
+  if (d.id) { const x = S.exams.find(z => z.id === d.id); x.name = d.name; x.date = d.date; x.topicIds = all; }
+  else addExam(R.classId, d.name, d.date, all);
+  closeModal();
+}
+
+/* ============================================================
+   EXAM RESULT
+   ============================================================ */
+function modalResult() {
+  const x = S.exams.find(z => z.id === R.modal.examId);
+  return modalWrap(`
+    <div class="eb">${esc(cls(x.classId).name)} · ${esc(x.name)}</div>
+    <h2 style="margin-top:5px">How did it go?</h2>
+    <div class="sub">Add your result to close out this exam. You'll be able to set up your next one straight after.</div>
+    <div class="field"><label>Outcome</label>
+      <div class="row" style="gap:8px">${["Passed", "Failed", "Rather not say"].map(o => `<button class="btn ${R.modal.out === o ? "bb" : "bg"}" onclick="R.modal.out='${o}';render()">${o}</button>`).join("")}</div></div>
+    <div class="field"><label>Score, if you know it (optional)</label><input placeholder="88" oninput="R.modal.grade=this.value"></div>
+    <div class="mfoot"><button class="btn bg" onclick="closeModal()">Not now</button>
+      <button class="btn bp" ${R.modal.out ? "" : "disabled"} onclick="saveResult()">Save result</button></div>`);
+}
+function saveResult() {
+  const x = S.exams.find(z => z.id === R.modal.examId);
+  x.result = { outcome: R.modal.out.toLowerCase(), grade: R.modal.grade || "—" };
+  x.past = true;
+  toast("Result saved. You can add your next exam."); closeModal();
+}
+
+/* ============================================================
+   EDIT CLASS
+   ============================================================ */
+function modalEditClass() {
+  const c = cls(R.classId), d = R.modal.d;
+  return modalWrap(`
+    <h2>Edit class</h2>
+    <div class="field"><label>Class name</label><input value="${esc(d.name)}" oninput="R.modal.d.name=this.value"></div>
+    <div class="field"><label>Areas this class covers</label>
+<div class="selectwrap"><select onchange="editCat(this.value)">
+<option value="">None</option>
+${CATS.map(x => `<option value="${x.id}" ${d.cat === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}
+</select></div>${d.cat ? areaBlurb(d.cat) : ""}</div>
+    <div class="row" style="gap:14px">
+      <div class="field" style="flex:1"><label>Instructor <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+        <input value="${esc(d.instructor || "")}" oninput="R.modal.d.instructor=this.value"></div>
+      <div class="field" style="flex:1"><label>Class ends <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+        <input type="date" value="${dstr(d.ends)}" onchange="R.modal.d.ends=this.value?new Date(this.value+'T12:00:00'):null"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn bg" style="margin-right:auto;border-color:#f3b8c5;color:var(--cerise)" onclick="archiveClass('${c.id}')">${c.archived ? "Unarchive" : "Archive class"}</button>
+      <button class="btn bg" onclick="closeModal()">Cancel</button>
+      <button class="btn bp" onclick="saveClass()">Save</button></div>`);
+}
+function editCat(id) { R.modal.d.cat = id; render(); }
+function saveClass() {
+  const c = cls(R.classId), d = R.modal.d;
+  c.name = d.name; c.cat = d.cat || null; c.instructor = d.instructor || ""; c.ends = d.ends || null;
+  closeModal();
+}
+function archiveClass(id) { const c = cls(id); c.archived = !c.archived; R.modal = null; go("classes"); }
+
+/* ============================================================
+   ADD ITEM
+   ============================================================ */
+function modalAddItem() {
+  const c = cls(R.classId), cat = c.cat ? CAT(c.cat) : null;
+  const orph = ORPHANS.filter(o => !cat || o.cat === cat.id);
+  return modalWrap(`
+    <h2>Add an extra</h2>
+    <div class="sub">Save a video or guide to ${esc(c.name)} so you can find it again.</div>
+    <div class="picklist" style="max-height:260px">
+      ${orph.map(o => `<div class="pick" onclick="pinItem('${o.id}')"><div class="cbx"></div><div class="n">${esc(o.t)}</div><div class="sm">Video · ${esc(o.d)}</div></div>`).join("")}
+      ${orph.length ? "" : `<div class="sm">No unattached content in this category.</div>`}
+    </div>
+    <div class="mfoot"><button class="btn bg" onclick="closeModal()">Done</button></div>`);
+}
+function pinItem(oid) {
+  const o = ORPHANS.find(x => x.id === oid);
+  addItem(R.classId, "video", o.t, { dur: o.d, th: o.th, src: "orphan" });
+  toast("Pinned to class"); closeModal();
+}
+
+/* ============================================================
+   NAV + SHELL
+   ============================================================ */
+function sidebar() {
+  const cs = S.classes.filter(c => !c.archived);
+  return `<div class="side">
+    <div class="brand"><span class="a">Simple</span><span class="b">Nursing</span></div>
+    <div class="sbox">⌕ Search all content</div>
+    <div class="ptabs"><div class="on">NURSING SCHOOL</div><div>NCLEX</div></div>
+    <div class="nit ${R.view === "home" ? "on" : ""}" onclick="go('home')"><span class="ic">⌂</span> Home</div>
+    <div class="nit ${["classes", "class", "topic", "check"].includes(R.view) ? "on" : ""}" onclick="go('classes')"><span class="ic">▤</span> My classes</div>
+    ${cs.map(c => `<div class="nsub ${R.classId === c.id ? "on" : ""}" onclick="go('class',{classId:'${c.id}'})">${esc(c.name)}</div>`).join("")}
+    <div class="ndiv"></div>
+    <div class="nsec">LEARN</div>
+    ${["Video lessons", "Study Guide PDFs", "Exit Exam Prep", "Nursing Webinars"].map(x => `<div class="nit" onclick="toast('${esc(x)}')"><span class="ic">▷</span> ${esc(x)}</div>`).join("")}
+    <div class="nsec">PRACTICE</div>
+    ${["Course Question Bank", "NCLEX Question Bank"].map(x => `<div class="nit" onclick="toast('${esc(x)}')"><span class="ic">▤</span> ${esc(x)}</div>`).join("")}
+    <div class="ndiv"></div>
+    <div class="nit" onclick="toast('My collections')"><span class="ic">≡</span> My collections </div>
+  </div>`;
+}
+
+const SCEN = [
+  ["cold", "0 · Cold start"], ["browse", "1 · Classes, no topics"], ["topics", "2 · Topics added"],
+  ["exam", "3 · Exam set"], ["postexam", "3 · After the exam"]
+];
+var DEV = false;
+function devbar() {
+  return `${DEV ? `<div class="panel">
+      <b>Test scenario</b>
+      ${SCEN.map(([k, l]) => `<button class="${R.scenario === k ? "on" : ""}" onclick="scenario('${k}');render()">${l}</button>`).join("")}
+      <div class="foot">
+        <button onclick="advance()" style="margin-bottom:6px">Advance 10 days</button>
+        Today: ${S.now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+      </div>
+    </div>` : ""}
+    <button class="knob" title="Prototype controls" onclick="DEV=!DEV;render()">${DEV ? "&#10005;" : "&#9881;"}</button>`;
+}
+function advance() {
+  S.now = new Date(S.now.getTime() + 10 * 864e5);
+  S.exams.forEach(x => { if (x.date < S.now) x.past = x.result ? true : x.past; });
+  toast("Moved 10 days forward"); render();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render() {
+  let body = "";
+  if (R.view === "home") body = screenHome();
+  else if (R.view === "classes") body = screenClasses();
+  else if (R.view === "class") body = screenClass();
+  else if (R.view === "topic") body = screenTopic();
+  else if (R.view === "check") body = screenCheck();
+
+  document.body.classList.toggle("nonotes", !R.notes);
+  $("#app").innerHTML = sidebar() + body + (R.menu ? `<div class="menuscrim" onclick="R.menu=null;render()"></div>` : "");
+
+  let m = "";
+  if (R.modal) {
+    const t = R.modal.t;
+    if (t === "addclass") m = modalAddClass();
+    if (t === "addtopics") m = modalAddTopics();
+    if (t === "addexam") m = modalAddExam();
+    if (t === "result") m = modalResult();
+    if (t === "editclass") m = modalEditClass();
+    if (t === "additem") m = modalAddItem();
+  }
+  if (R.confirm) {
+    const cf = R.confirm;
+    m = `<div class="scrim" onclick="if(event.target===this){R.confirm=null;render()}"><div class="modal" style="max-width:480px">
+      <h2>${esc(cf.title)}</h2>
+      <div class="sub" style="margin-top:8px">${esc(cf.body)}</div>
+      <div class="mfoot"><button class="btn bg" onclick="R.confirm=null;render()">Go back</button>
+      <button class="btn bp" onclick="R.confirm=null;${cf.fn}">${esc(cf.yes)}</button></div>
+    </div></div>`;
+  }
+  $("#modalroot").innerHTML = m;
+  $("#devbar").innerHTML = devbar();
+  const f = document.querySelector("#modalroot input[autofocus]");
+  if (f) { const v = f.value; f.focus(); f.setSelectionRange(v.length, v.length); }
+}
+
+scenario("exam");
+R.view = "home";
+render();
+</script>
+</body>
+</html>
