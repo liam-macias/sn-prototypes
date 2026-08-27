@@ -226,6 +226,39 @@ body.nonotes .note,body.nonotes .tier{display:none}
 .selectwrap select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,112,156,.18)}
 .explain{background:var(--infosoft);border-radius:var(--r);padding:11px 14px;font-size:13px;margin-top:10px;line-height:1.45}
 .explain b{font-weight:700}
+
+.opt{text-transform:none;font-weight:400;color:var(--muted)}
+.card.exam{border-top:3px solid var(--blue)}
+.examtopics{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.etchip{border:1px solid var(--n200);border-radius:var(--rp);padding:5px 13px;font-size:12.5px;font-weight:600;color:var(--n700);cursor:pointer;background:#fff}
+.etchip:hover{border-color:var(--blue);color:var(--blue)}
+.etchip.dn{background:var(--grn100);border-color:#a0e2a9;color:var(--grn700)}
+.qlab{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--n700);margin-bottom:4px}
+.sm.warn{color:#8a6100}.sm.ok{color:var(--grn700)}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.fchip{border:1.4px solid var(--n200);border-radius:var(--rp);padding:6px 15px;font-size:12.5px;font-weight:600;color:var(--n700);background:#fff}
+.fchip:hover{border-color:var(--blue);color:var(--blue)}
+.fchip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.legend{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-bottom:10px}
+.lg-bars{display:inline-flex;gap:3px}
+.lg-bars i{width:14px;height:5px;border-radius:3px;background:var(--n200);display:block}
+.unitlbl{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--n600);margin:16px 0 7px}
+.unitlbl:first-of-type{margin-top:4px}
+.unitrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border:1px solid var(--n100);border-radius:var(--r);margin-bottom:7px}
+.unitrow .un{font-size:15px;font-weight:700}
+.bars{display:inline-flex;gap:4px}
+.bars i{width:22px;height:6px;border-radius:3px;background:var(--n200);display:block}
+.bars i.on{background:var(--blue)}
+.tcard .lead{cursor:pointer}
+.chiprow{display:flex;gap:6px;margin-bottom:4px}
+.uacc{border-top:1px solid var(--n100);padding:6px 0}
+.uacc:first-child{border-top:none}
+.uhead{display:flex;align-items:center;gap:9px;padding:7px 6px;cursor:pointer;border-radius:6px}
+.uhead:hover{background:var(--active)}
+.uhead .uname{font-weight:600;font-size:14px;flex:1}
+
+.xbtn{color:var(--n300);font-size:17px;line-height:1;padding:2px 5px;border-radius:5px}
+.xbtn:hover{color:var(--n700);background:var(--n075)}
 </style>
 </head>
 <body>
@@ -234,84 +267,138 @@ body.nonotes .note,body.nonotes .tier{display:none}
 <div id="devbar"></div>
 <script>
 /* ============================================================
-   TAXONOMY  (global; a Topic is NOT owned by a Class)
+   TAXONOMY — Class (area) > Unit > Topic
+   Mirrors the Video Lessons hierarchy in sn_videos_categories.
    ============================================================ */
 const TH = {r:["#e8175d","#a3123f"],b:["#1b7ec4","#0d4f80"],v:["#7b3fb3","#4d2172"],o:["#f08c00","#b06400"],
   t:["#0f9b8e","#08635a"],g:["#4a9d3f","#2c6626"],p:["#d4468c","#8e2a5c"],n:["#3b4d78","#22304d"]};
 
 const CATS = [
-  {id:"medsurg", name:"Med-Surg", topics:[
-    {id:"hf",   n:"Heart failure",              v:"Heart Failure",              d:"14 min", th:"r", q:12},
-    {id:"mi",   n:"Myocardial infarction",      v:"MI & ACS",                   d:"11 min", th:"r", q:10},
-    {id:"copd", n:"COPD",                       v:"COPD",                       d:"9 min",  th:"t", q:8},
-    {id:"asth", n:"Asthma",                     v:"Asthma",                     d:"8 min",  th:"t", q:9},
-    {id:"aki",  n:"Acute kidney injury",        v:"AKI",                        d:"12 min", th:"b", q:8},
-    {id:"dka",  n:"DKA vs HHS",                 v:"DKA vs HHS: Priorities",     d:"14 min", th:"o", q:11},
-    {id:"fe",   n:"Fluid & electrolytes",       v:"Fluid & Electrolytes",       d:"17 min", th:"b", q:14},
-    {id:"seps", n:"Sepsis & shock",             v:"Sepsis",                     d:"10 min", th:"v", q:9}]},
-  {id:"pharm", name:"Pharmacology", topics:[
-    {id:"ahtn", n:"Antihypertensives",          v:"Antihypertensives",          d:"13 min", th:"b", q:12},
-    {id:"card", n:"Cardiac drugs",              v:"Beta Blockers",              d:"11 min", th:"r", q:13},
-    {id:"anti", n:"Anticoagulants",             v:"Anticoagulants",             d:"12 min", th:"v", q:10},
-    {id:"ins",  n:"Insulin drugs",              v:"Insulin",                    d:"15 min", th:"o", q:12},
-    {id:"abx",  n:"Antibiotics",                v:"Antibiotics",                d:"16 min", th:"g", q:11},
-    {id:"opi",  n:"Opioid analgesics",          v:"Opioids",                    d:"10 min", th:"p", q:9},
-    {id:"cort", n:"Corticosteroids",            v:"Corticosteroids",            d:"8 min",  th:"o", q:8},
-    {id:"bron", n:"Bronchodilators",            v:"Bronchodilators",            d:"9 min",  th:"t", q:8}]},
-  {id:"patho", name:"Pathophysiology", topics:[
-    {id:"infl", n:"Inflammation",               v:"Inflammation",               d:"10 min", th:"r", q:9},
-    {id:"cell", n:"Cellular injury",            v:"Cellular Injury",            d:"9 min",  th:"v", q:8},
-    {id:"acid", n:"Acid-base balance",          v:"Acid-Base Balance",          d:"18 min", th:"b", q:14},
-    {id:"immu", n:"Immunity",                   v:"Immunity",                   d:"11 min", th:"g", q:9},
-    {id:"canc", n:"Cancer basics",              v:"Oncology Basics",            d:"13 min", th:"p", q:10},
-    {id:"shk",  n:"Shock states",               v:"Shock",                      d:"12 min", th:"n", q:10}]},
-  {id:"fund", name:"Fundamentals", topics:[
-    {id:"vit",  n:"Vital signs",                v:"Vital Signs",                d:"8 min",  th:"t", q:8},
-    {id:"inf",  n:"Infection control",          v:"Infection Control",          d:"9 min",  th:"g", q:9},
-    {id:"safe", n:"Safety & falls",             v:"Safety & Falls",             d:"7 min",  th:"o", q:8},
-    {id:"mob",  n:"Mobility",                   v:"Mobility & Positioning",     d:"10 min", th:"b", q:8},
-    {id:"wnd",  n:"Wound care",                 v:"Wound Care",                 d:"11 min", th:"p", q:9},
-    {id:"pain", n:"Pain management",            v:"Pain Management",            d:"12 min", th:"r", q:10}]},
-  {id:"mh", name:"Mental Health", topics:[
-    {id:"anx",  n:"Anxiety disorders",          v:"Anxiety Disorders",          d:"10 min", th:"v", q:9},
-    {id:"dep",  n:"Depression",                 v:"Depression",                 d:"11 min", th:"n", q:9},
-    {id:"bip",  n:"Bipolar disorder",           v:"Bipolar",                    d:"10 min", th:"p", q:8},
-    {id:"schz", n:"Schizophrenia",              v:"Schizophrenia",              d:"12 min", th:"v", q:10},
-    {id:"sub",  n:"Substance use",              v:"Substance Use",              d:"13 min", th:"o", q:9},
-    {id:"thpc", n:"Therapeutic communication",  v:"Therapeutic Communication",  d:"9 min",  th:"t", q:8},
-    {id:"adhd", n:"ADHD/ADD",                   v:"ADHD/ADD",                   d:"8 min",  th:"r", q:8}]},
-  {id:"ob", name:"Maternity / OB", topics:[
-    {id:"pren", n:"Prenatal care",              v:"Prenatal Care",              d:"12 min", th:"p", q:10},
-    {id:"labr", n:"Stages of labor",            v:"Stages of Labor",            d:"14 min", th:"r", q:11},
-    {id:"post", n:"Postpartum complications",   v:"Postpartum Complications",   d:"11 min", th:"v", q:9},
-    {id:"fetl", n:"Fetal monitoring",           v:"Fetal Monitoring",           d:"13 min", th:"b", q:10},
-    {id:"newb", n:"Newborn assessment",         v:"Newborn Assessment",         d:"10 min", th:"t", q:9}]},
-  {id:"peds", name:"Pediatrics", topics:[
-    {id:"grow", n:"Growth & development",       v:"Growth & Development",       d:"11 min", th:"g", q:9},
-    {id:"pres", n:"Pediatric respiratory",      v:"Peds Respiratory",           d:"12 min", th:"t", q:10},
-    {id:"chd",  n:"Congenital heart defects",   v:"Congenital Heart Defects",   d:"13 min", th:"r", q:10},
-    {id:"immz", n:"Immunizations",              v:"Immunizations",              d:"8 min",  th:"o", q:8},
-    {id:"dpeds",n:"Diabetes pediatrics",        v:"Diabetes Pediatrics",        d:"10 min", th:"o", q:9}]}
+  {id:"medsurg", name:"Med-Surg", units:[
+    {id:"ms-cv", n:"Cardiovascular", topics:[
+      {id:"hf",   n:"Heart failure",         v:"Heart Failure",          d:"14 min", th:"r", q:12},
+      {id:"mi",   n:"Myocardial infarction", v:"MI & ACS",               d:"11 min", th:"r", q:10},
+      {id:"htncr",n:"Hypertensive crisis",   v:"Hypertensive Crisis",    d:"9 min",  th:"r", q:8}]},
+    {id:"ms-resp", n:"Respiratory", topics:[
+      {id:"copd", n:"COPD",                  v:"COPD",                   d:"9 min",  th:"t", q:8},
+      {id:"asth", n:"Asthma",                v:"Asthma",                 d:"8 min",  th:"t", q:9},
+      {id:"pna",  n:"Pneumonia",             v:"Pneumonia",              d:"11 min", th:"t", q:10},
+      {id:"tb",   n:"Tuberculosis",          v:"Tuberculosis",           d:"10 min", th:"t", q:9}]},
+    {id:"ms-renal", n:"Renal & urinary", topics:[
+      {id:"aki",  n:"Acute kidney injury",   v:"AKI",                    d:"12 min", th:"b", q:8},
+      {id:"ckd",  n:"Chronic kidney disease",v:"CKD",                    d:"13 min", th:"b", q:9},
+      {id:"fe",   n:"Fluid & electrolytes",  v:"Fluid & Electrolytes",   d:"17 min", th:"b", q:14}]},
+    {id:"ms-endo", n:"Endocrine", topics:[
+      {id:"dka",  n:"DKA vs HHS",            v:"DKA vs HHS: Priorities", d:"14 min", th:"o", q:11},
+      {id:"thyr", n:"Thyroid disorders",     v:"Thyroid Disorders",      d:"10 min", th:"o", q:9}]},
+    {id:"ms-inf", n:"Immune & infectious", topics:[
+      {id:"seps", n:"Sepsis & shock",        v:"Sepsis",                 d:"10 min", th:"v", q:9},
+      {id:"hiv",  n:"HIV & immunosuppression",v:"HIV",                   d:"12 min", th:"v", q:8}]}]},
+
+  {id:"pharm", name:"Pharmacology", units:[
+    {id:"ph-card", n:"Cardiac drugs", topics:[
+      {id:"ahtn", n:"Antihypertensives",     v:"Antihypertensives",      d:"13 min", th:"b", q:12},
+      {id:"card", n:"Beta blockers",         v:"Beta Blockers",          d:"11 min", th:"r", q:13},
+      {id:"dig",  n:"Cardiac glycosides",    v:"Digoxin Toxicity",       d:"9 min",  th:"r", q:9},
+      {id:"anti", n:"Anticoagulants",        v:"Anticoagulants",         d:"12 min", th:"v", q:10}]},
+    {id:"ph-endo", n:"Endocrine drugs", topics:[
+      {id:"ins",  n:"Insulin drugs",         v:"Insulin",                d:"15 min", th:"o", q:12},
+      {id:"oral", n:"Oral antidiabetics",    v:"Oral Antidiabetics",     d:"10 min", th:"o", q:9},
+      {id:"cort", n:"Corticosteroids",       v:"Corticosteroids",        d:"8 min",  th:"o", q:8}]},
+    {id:"ph-inf", n:"Anti-infectives", topics:[
+      {id:"abx",  n:"Antibiotics",           v:"Antibiotics",            d:"16 min", th:"g", q:11},
+      {id:"anfu", n:"Antifungals & antivirals",v:"Antifungals",          d:"9 min",  th:"g", q:8}]},
+    {id:"ph-resp", n:"Respiratory drugs", topics:[
+      {id:"bron", n:"Bronchodilators",       v:"Bronchodilators",        d:"9 min",  th:"t", q:8}]},
+    {id:"ph-pain", n:"Pain & inflammation", topics:[
+      {id:"opi",  n:"Opioid analgesics",     v:"Opioids",                d:"10 min", th:"p", q:9},
+      {id:"nsaid",n:"NSAIDs & non-opioids",  v:"NSAIDs",                 d:"8 min",  th:"p", q:8}]}]},
+
+  {id:"patho", name:"Pathophysiology", units:[
+    {id:"pa-cell", n:"Cellular & inflammation", topics:[
+      {id:"infl", n:"Inflammation",          v:"Inflammation",           d:"10 min", th:"r", q:9},
+      {id:"cell", n:"Cellular injury",       v:"Cellular Injury",        d:"9 min",  th:"v", q:8}]},
+    {id:"pa-ab", n:"Acid-base & fluids", topics:[
+      {id:"acid", n:"Acid-base balance",     v:"Acid-Base Balance",      d:"18 min", th:"b", q:14},
+      {id:"abg",  n:"ABG interpretation",    v:"ABGs",                   d:"15 min", th:"b", q:12}]},
+    {id:"pa-imm", n:"Immunity", topics:[
+      {id:"immu", n:"Immunity",              v:"Immunity",               d:"11 min", th:"g", q:9}]},
+    {id:"pa-onc", n:"Oncology", topics:[
+      {id:"canc", n:"Cancer basics",         v:"Oncology Basics",        d:"13 min", th:"p", q:10}]},
+    {id:"pa-shk", n:"Shock", topics:[
+      {id:"shk",  n:"Shock states",          v:"Shock",                  d:"12 min", th:"n", q:10}]}]},
+
+  {id:"fund", name:"Fundamentals", units:[
+    {id:"fu-assess", n:"Assessment basics", topics:[
+      {id:"vit",  n:"Vital signs",           v:"Vital Signs",            d:"8 min",  th:"t", q:8},
+      {id:"labs", n:"Lab values",            v:"Lab Values",             d:"14 min", th:"n", q:12}]},
+    {id:"fu-safe", n:"Safety", topics:[
+      {id:"inf",  n:"Infection control",     v:"Infection Control",      d:"9 min",  th:"g", q:9},
+      {id:"safe", n:"Safety & falls",        v:"Safety & Falls",         d:"7 min",  th:"o", q:8}]},
+    {id:"fu-skill", n:"Skills", topics:[
+      {id:"mob",  n:"Mobility",              v:"Mobility & Positioning", d:"10 min", th:"b", q:8},
+      {id:"wnd",  n:"Wound care",            v:"Wound Care",             d:"11 min", th:"p", q:9}]},
+    {id:"fu-comf", n:"Comfort", topics:[
+      {id:"pain", n:"Pain management",       v:"Pain Management",        d:"12 min", th:"r", q:10}]}]},
+
+  {id:"mh", name:"Mental Health", units:[
+    {id:"mh-mood", n:"Mood disorders", topics:[
+      {id:"dep",  n:"Depression",            v:"Depression",             d:"11 min", th:"n", q:9},
+      {id:"bip",  n:"Bipolar disorder",      v:"Bipolar",                d:"10 min", th:"p", q:8}]},
+    {id:"mh-psy", n:"Psychotic disorders", topics:[
+      {id:"schz", n:"Schizophrenia",         v:"Schizophrenia",          d:"12 min", th:"v", q:10}]},
+    {id:"mh-anx", n:"Anxiety & trauma", topics:[
+      {id:"anx",  n:"Anxiety disorders",     v:"Anxiety Disorders",      d:"10 min", th:"v", q:9},
+      {id:"adhd", n:"ADHD/ADD",              v:"ADHD/ADD",               d:"8 min",  th:"r", q:8}]},
+    {id:"mh-sub", n:"Substance use", topics:[
+      {id:"sub",  n:"Substance use",         v:"Substance Use",          d:"13 min", th:"o", q:9}]},
+    {id:"mh-comm", n:"Communication", topics:[
+      {id:"thpc", n:"Therapeutic communication",v:"Therapeutic Communication",d:"9 min",th:"t",q:8}]}]},
+
+  {id:"ob", name:"Maternity / OB", units:[
+    {id:"ob-ante", n:"Antepartum", topics:[
+      {id:"pren", n:"Prenatal care",         v:"Prenatal Care",          d:"12 min", th:"p", q:10}]},
+    {id:"ob-intra", n:"Intrapartum", topics:[
+      {id:"labr", n:"Stages of labor",       v:"Stages of Labor",        d:"14 min", th:"r", q:11},
+      {id:"fetl", n:"Fetal monitoring",      v:"Fetal Monitoring",       d:"13 min", th:"b", q:10}]},
+    {id:"ob-post", n:"Postpartum", topics:[
+      {id:"post", n:"Postpartum complications",v:"Postpartum Complications",d:"11 min",th:"v",q:9}]},
+    {id:"ob-newb", n:"Newborn", topics:[
+      {id:"newb", n:"Newborn assessment",    v:"Newborn Assessment",     d:"10 min", th:"t", q:9}]}]},
+
+  {id:"peds", name:"Pediatrics", units:[
+    {id:"pe-grow", n:"Growth & development", topics:[
+      {id:"grow", n:"Growth & development",  v:"Growth & Development",   d:"11 min", th:"g", q:9}]},
+    {id:"pe-resp", n:"Peds respiratory", topics:[
+      {id:"pres", n:"Pediatric respiratory", v:"Peds Respiratory",       d:"12 min", th:"t", q:10}]},
+    {id:"pe-card", n:"Peds cardiac", topics:[
+      {id:"chd",  n:"Congenital heart defects",v:"Congenital Heart Defects",d:"13 min",th:"r",q:10}]},
+    {id:"pe-endo", n:"Peds endocrine", topics:[
+      {id:"dpeds",n:"Diabetes pediatrics",   v:"Diabetes Pediatrics",    d:"10 min", th:"o", q:9}]},
+    {id:"pe-hp", n:"Health promotion", topics:[
+      {id:"immz", n:"Immunizations",         v:"Immunizations",          d:"8 min",  th:"o", q:8}]}]}
 ];
 
-/* Videos that exist in the library but are NOT folded into any topic.
-   This is the orphan-content problem. They can only be attached to a class as Items. */
+/* Library content that isn't folded into a topic. Can only be pinned as an Extra. */
 const ORPHANS = [
-  {id:"o1", cat:"medsurg", t:"Amputations",                     d:"7 min",  th:"v"},
-  {id:"o2", cat:"medsurg", t:"Metabolic & Respiratory ABG",     d:"15 min", th:"b"},
+  {id:"o1", cat:"medsurg", t:"Amputations",                      d:"7 min",  th:"v"},
+  {id:"o2", cat:"medsurg", t:"Metabolic & Respiratory ABG",      d:"15 min", th:"b"},
   {id:"o3", cat:"pharm",   t:"Dosage calculation: IV drip rates",d:"12 min", th:"g"},
-  {id:"o4", cat:"pharm",   t:"Drug suffixes & mnemonics",       d:"6 min",  th:"o"},
-  {id:"o5", cat:"fund",    t:"Lab values cheat run-through",    d:"18 min", th:"n"},
-  {id:"o6", cat:"mh",      t:"Test-taking: SATA strategy",      d:"9 min",  th:"p"},
-  {id:"o7", cat:"patho",   t:"Nurse Mike's 12 must-know labs",  d:"20 min", th:"b"},
-  {id:"o8", cat:"ob",      t:"Newborn reflexes quick review",   d:"5 min",  th:"t"}
+  {id:"o4", cat:"pharm",   t:"Drug suffixes & mnemonics",        d:"6 min",  th:"o"},
+  {id:"o5", cat:"fund",    t:"Lab values cheat run-through",     d:"18 min", th:"n"},
+  {id:"o6", cat:"mh",      t:"Test-taking: SATA strategy",       d:"9 min",  th:"p"},
+  {id:"o7", cat:"patho",   t:"Nurse Mike's 12 must-know labs",   d:"20 min", th:"b"},
+  {id:"o8", cat:"ob",      t:"Newborn reflexes quick review",    d:"5 min",  th:"t"}
 ];
 
-const ALLTOPICS = {};
-CATS.forEach(c => c.topics.forEach(t => { t.cat = c.id; t.catName = c.name; ALLTOPICS[t.id] = t; }));
+const ALLTOPICS = {}, ALLUNITS = {};
+CATS.forEach(c => c.units.forEach(u => {
+  u.cat = c.id; u.catName = c.name; ALLUNITS[u.id] = u;
+  u.topics.forEach(t => { t.cat = c.id; t.catName = c.name; t.unit = u.id; t.unitName = u.n; ALLTOPICS[t.id] = t; });
+}));
 const CAT = id => CATS.find(c => c.id === id);
+const catTopics = id => CAT(id).units.reduce((a, u) => a.concat(u.topics), []);
 
-/* Class-name -> category mapping. This is what makes a name-only class useful. */
 const NAMEMAP = [
   [/med.?surg|medical.?surgical|adult health/i, "medsurg"],
   [/pharm/i, "pharm"],
@@ -328,65 +415,64 @@ function guessCat(name) {
 
 /* ============================================================
    STATE
-   Class > (Topic enrollments | Items | Exams)
-   A topic enrollment is per-class. Same topic in two classes = two records.
+   Class > Topic enrollments (loop progress, per class)
+         > Items (extras)
+         > Exams (planning object -> readiness quiz)
+   Mastery is GLOBAL per topic: every answered question counts,
+   whatever class or quiz it came from.
    ============================================================ */
 var S, R;
 var SEQ = 100;
 const uid = p => p + (++SEQ);
-const TODAY = new Date(2026, 9, 6); // Oct 6 2026, mid Fall semester
+const TODAY = new Date(2026, 9, 6);
+const READY_BAR = 75;
+const MIN_PER_TOPIC = 5;
 
 function fmt(d) { return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }); }
 function daysTo(d) { return Math.round((d - S.now) / 864e5); }
 
 function blankState() {
   return {
-    user: { name: "Juli" },
     now: new Date(TODAY),
-    classes: [], enroll: [], items: [], exams: [], recs: [],
-    watch: [],      // continue watching: {key,title,cat,th,dur,pct,when}
-    jump: [],       // jump back in
-    log: []         // global activity log {classId, topicId, text, when}
+    classes: [], enroll: [], items: [], exams: [],
+    mastery: {},    // topicId -> {answered, correct, seen:[questionKey]}
+    recs: [], watch: [], jump: [], log: [], dismissed: []
   };
 }
 
-function addClass(name, opts) {
-  opts = opts || {};
-  const c = {
-    id: uid("c"), name,
-    cat: opts.cat !== undefined ? opts.cat : guessCat(name),
-    instructor: opts.instructor || "", ends: opts.ends || null,
-    archived: false, created: opts.created || "Aug 26"
-  };
+function addClass(name, o) {
+  o = o || {};
+  const c = { id: uid("c"), name, cat: o.cat !== undefined ? o.cat : guessCat(name),
+    instructor: o.instructor || "", ends: o.ends || null, archived: false, created: o.created || "Aug 26" };
   S.classes.push(c); return c;
 }
 function enroll(classId, topicId, o) {
   o = o || {};
-  const e = {
-    id: uid("e"), classId, topicId,
-    watch: !!o.watch, review: !!o.review, quiz: !!o.quiz,
-    quizScore: o.quizScore === undefined ? null : o.quizScore,
-    quizAnswered: o.quizAnswered || 0, quizCorrect: o.quizCorrect || 0,
-    added: o.added || "Sep 2"
-  };
+  const e = { id: uid("e"), classId, topicId, watch: !!o.watch, review: !!o.review, quiz: !!o.quiz, added: o.added || "Sep 2" };
   S.enroll.push(e); return e;
 }
 function addItem(classId, kind, title, o) {
   o = o || {};
-  const i = { id: uid("i"), classId, kind, title, dur: o.dur || "", th: o.th || "b", src: o.src || "manual" };
+  const i = { id: uid("i"), classId, kind, title, dur: o.dur || "", th: o.th || "b" };
   S.items.push(i); return i;
 }
 function addExam(classId, name, date, topicIds, o) {
   o = o || {};
-  const e = {
-    id: uid("x"), classId, name, date, topicIds: topicIds.slice(),
-    checkpoint: o.checkpoint || null,   // {score, total, correct, perTopic:{tid:{c,t}}, takenOn}
-    result: o.result || null,           // {outcome, grade}
-    past: !!o.past
-  };
-  S.exams.push(e); return e;
+  const x = { id: uid("x"), classId, name, date, topicIds: topicIds.slice(),
+    qcount: o.qcount || 20, attempts: o.attempts || [], result: o.result || null, past: !!o.past };
+  S.exams.push(x); return x;
 }
 function logIt(classId, topicId, text, when) { S.log.unshift({ classId, topicId, text, when }); }
+
+/* ---- mastery ---- */
+function mastery(tid) { return S.mastery[tid] || null; }
+function masteryPct(tid) { const m = mastery(tid); return m && m.answered ? Math.round(m.correct / m.answered * 100) : null; }
+function recordAnswer(tid, correct, key) {
+  const m = S.mastery[tid] || (S.mastery[tid] = { answered: 0, correct: 0, seen: [] });
+  m.answered++; if (correct) m.correct++;
+  if (key && !m.seen.includes(key)) m.seen.push(key);
+}
+function seedMastery(tid, answered, correct) { S.mastery[tid] = { answered, correct, seen: [] }; }
 
 /* ---- derived ---- */
 const enrollsOf = cid => S.enroll.filter(e => e.classId === cid);
@@ -399,6 +485,7 @@ const stepsDone = e => (e.watch ? 1 : 0) + (e.review ? 1 : 0) + (e.quiz ? 1 : 0)
 const eDone = e => stepsDone(e) === 3;
 const eStarted = e => stepsDone(e) > 0;
 const nextExam = cid => examsOf(cid).filter(x => !x.past).sort((a, b) => a.date - b.date)[0] || null;
+const lastAttempt = x => x.attempts.length ? x.attempts[x.attempts.length - 1] : null;
 function classPct(cid) {
   const es = enrollsOf(cid); if (!es.length) return 0;
   return Math.round(es.reduce((s, e) => s + stepsDone(e), 0) / (es.length * 3) * 100);
@@ -408,92 +495,85 @@ function tierOf(cid) {
   if (enrollsOf(cid).length) return 2;
   return 1;
 }
+function upNext(pool) {
+  const list = pool.filter(e => !eDone(e));
+  return list.filter(eStarted)[0] || list[0] || null;
+}
 
 /* ============================================================
    SCENARIOS
    ============================================================ */
 function scenario(which) {
   S = blankState(); SEQ = 100;
-  R = { view: "home", classId: null, enrollId: null, examId: null, modal: null, tab: "current", notes: R ? R.notes : true, scenario: which };
+  R = { view: "home", classId: null, enrollId: null, modal: null, tab: "current", scenario: which,
+        filter: "all", hideDone: false };
 
-  if (which === "cold") {
-    S.recs = ["fe", "dka", "ahtn", "acid", "pain", "hf"];
-    return;
-  }
+  if (which === "cold") { S.recs = ["fe", "dka", "ahtn", "acid", "pain", "hf"]; return; }
 
-  /* --- shared: continue-watching / jump-back-in always exist, no setup needed --- */
   const seedResume = () => {
     S.watch = [
-      { key: "hf", title: "Heart Failure", cat: "medsurg", th: "r", dur: "14 min", pct: 62, when: "yesterday" },
-      { key: "adhd", title: "ADHD/ADD", cat: "mh", th: "r", dur: "8 min", pct: 55, when: "2 days ago" },
-      { key: "o1", title: "Amputations", cat: "medsurg", th: "v", dur: "7 min", pct: 30, when: "last week", orphan: true },
-      { key: "acid", title: "Acid-Base Balance", cat: "patho", th: "b", dur: "18 min", pct: 20, when: "last week" },
-      { key: "ins", title: "Insulin", cat: "pharm", th: "o", dur: "15 min", pct: 80, when: "3 days ago" }
-    ];
-    S.jump = [
-      { ico: "Q", t: "Cardiac drugs quiz", m: "8 of 13 questions · started 4 days ago", btn: "Continue quiz" },
-      { ico: "G", t: "Metabolic & Respiratory ABG", m: "Study Guide PDF · opened 2 days ago", btn: "Open" },
-      { ico: "C", t: "Cardio collection", m: "8 items · created 2 weeks ago", btn: "Open" }
+      { key: "hf", title: "Heart Failure", th: "r", dur: "14 min", pct: 62, when: "yesterday" },
+      { key: "adhd", title: "ADHD/ADD", th: "r", dur: "8 min", pct: 55, when: "2 days ago" },
+      { key: "o1", title: "Amputations", th: "v", dur: "7 min", pct: 30, when: "last week" },
+      { key: "acid", title: "Acid-Base Balance", th: "b", dur: "18 min", pct: 20, when: "last week" },
+      { key: "ins", title: "Insulin", th: "o", dur: "15 min", pct: 80, when: "3 days ago" }
     ];
   };
 
   if (which === "browse") {
     seedResume();
-    addClass("Med Surg I", { instructor: "Prof. J. Whitfield", ends: new Date(2026,11,15), created: "Aug 26" });
-    addClass("Pharmacology II", { instructor: "Prof. R. Alvarez", ends: new Date(2026,11,12), created: "Aug 26" });
-    addClass("Mental Health", { ends: null, created: "Sep 18" });
+    addClass("Med Surg I", { instructor: "Prof. J. Whitfield", ends: new Date(2026, 11, 15), created: "Aug 26" });
+    addClass("Pharmacology II", { instructor: "Prof. R. Alvarez", ends: new Date(2026, 11, 12), created: "Aug 26" });
+    addClass("Mental Health", { created: "Sep 18" });
     return;
   }
 
-  /* --- tier 2 and 3 share a class set --- */
-  const ms = addClass("Med Surg I", { instructor: "Prof. J. Whitfield", ends: new Date(2026,11,15), created: "Aug 26" });
-  const ph = addClass("Pharmacology II", { instructor: "Prof. R. Alvarez", ends: new Date(2026,11,12), created: "Aug 26" });
-  const mh = addClass("Mental Health", { ends: null, created: "Sep 18" });
+  const ms = addClass("Med Surg I", { instructor: "Prof. J. Whitfield", ends: new Date(2026, 11, 15), created: "Aug 26" });
+  const ph = addClass("Pharmacology II", { instructor: "Prof. R. Alvarez", ends: new Date(2026, 11, 12), created: "Aug 26" });
+  addClass("Mental Health", { created: "Sep 18" });
   seedResume();
 
-  // Pharm II — the deep class
-  enroll(ph.id, "ahtn", { watch: 1, review: 1, quiz: 1, quizScore: 71, quizAnswered: 12, quizCorrect: 9, added: "Sep 2" });
-  enroll(ph.id, "ins", { watch: 1, review: 1, quiz: 1, quizScore: 92, quizAnswered: 12, quizCorrect: 11, added: "Sep 2" });
-  enroll(ph.id, "card", { watch: 1, review: 0, quiz: 0, added: "Sep 20" });
-  enroll(ph.id, "anti", { watch: 0, review: 0, quiz: 0, added: "Sep 20" });
-  enroll(ph.id, "cort", { watch: 1, review: 1, quiz: 0, added: "Sep 28" });
-  addItem(ph.id, "video", "Dosage calculation: IV drip rates", { dur: "12 min", th: "g", src: "orphan" });
-  addItem(ph.id, "video", "Drug suffixes & mnemonics", { dur: "6 min", th: "o", src: "collection" });
-  addItem(ph.id, "guide", "Prof. Alvarez slide deck wk 6", { src: "manual" });
+  enroll(ph.id, "ahtn", { watch: 1, review: 1, quiz: 1, added: "Sep 2" });
+  enroll(ph.id, "ins",  { watch: 1, review: 1, quiz: 1, added: "Sep 2" });
+  enroll(ph.id, "card", { watch: 1, added: "Sep 20" });
+  enroll(ph.id, "anti", { added: "Sep 20" });
+  enroll(ph.id, "cort", { watch: 1, review: 1, added: "Sep 28" });
+  seedMastery("ahtn", 22, 15); seedMastery("ins", 18, 17); seedMastery("card", 9, 4);
+  addItem(ph.id, "video", "Dosage calculation: IV drip rates", { dur: "12 min", th: "g" });
+  addItem(ph.id, "video", "Drug suffixes & mnemonics", { dur: "6 min", th: "o" });
+  addItem(ph.id, "guide", "Prof. Alvarez slide deck wk 6");
 
-  // Med Surg I
-  enroll(ms.id, "fe", { watch: 1, review: 1, quiz: 1, quizScore: 58, quizAnswered: 14, quizCorrect: 8, added: "Sep 4" });
-  enroll(ms.id, "dka", { watch: 1, review: 0, quiz: 0, added: "Sep 29" });
-  enroll(ms.id, "hf", { watch: 0, review: 0, quiz: 0, added: "Oct 1" });
-  enroll(ms.id, "aki", { watch: 0, review: 0, quiz: 0, added: "Oct 1" });
-  addItem(ms.id, "video", "Metabolic & Respiratory ABG", { dur: "15 min", th: "b", src: "collection" });
+  enroll(ms.id, "fe",  { watch: 1, review: 1, quiz: 1, added: "Sep 4" });
+  enroll(ms.id, "dka", { watch: 1, added: "Sep 29" });
+  enroll(ms.id, "hf",  { added: "Oct 1" });
+  enroll(ms.id, "aki", { added: "Oct 1" });
+  seedMastery("fe", 26, 15); seedMastery("dka", 6, 5);
+  addItem(ms.id, "video", "Metabolic & Respiratory ABG", { dur: "15 min", th: "b" });
 
-  // Mental Health — set up but untouched. The "I made a class and never came back" case.
-  logIt(ph.id, "ahtn", "Quiz: Antihypertensives — 71%", "Sep 9");
-  logIt(ph.id, "ins", "Quiz: Insulin drugs — 92%", "Sep 14");
+  logIt(ph.id, "ahtn", "Quiz: Antihypertensives — 68%", "Sep 9");
+  logIt(ph.id, "ins", "Quiz: Insulin drugs — 94%", "Sep 14");
   logIt(ms.id, "fe", "Quiz: Fluid & electrolytes — 58%", "Sep 16");
   logIt(ph.id, "card", "Watched Beta Blockers (11 min)", "Oct 4");
   logIt(ms.id, "dka", "Watched DKA vs HHS (14 min)", "Oct 5");
 
   if (which === "topics") return;
 
-  /* --- tier 3: exams --- */
-  if (which === "exam" || which === "postexam") {
-    addExam(ph.id, "Exam 2", new Date(2026, 9, 14), ["card", "anti", "cort"], {});
-    addExam(ph.id, "Exam 1", new Date(2026, 8, 16), ["ahtn", "ins"], {
-      past: true,
-      checkpoint: { correct: 10, total: 12, score: 83, takenOn: "Sep 15", perTopic: { ahtn: { c: 4, t: 6 }, ins: { c: 6, t: 6 } } },
-      result: { outcome: "passed", grade: "88" }
-    });
-    addExam(ms.id, "Exam 2", new Date(2026, 9, 22), ["dka", "hf", "aki"], {});
-  }
+  addExam(ph.id, "Exam 2", new Date(2026, 9, 14), ["card", "anti", "cort"], { qcount: 20 });
+  addExam(ph.id, "Exam 1", new Date(2026, 8, 16), ["ahtn", "ins"], {
+    past: true, qcount: 15,
+    attempts: [{ score: 83, correct: 12, total: 15, fresh: 15, takenOn: "Sep 15",
+      perTopic: { ahtn: { c: 5, t: 8 }, ins: { c: 7, t: 7 } } }],
+    result: { outcome: "passed", grade: "88" }
+  });
+  addExam(ms.id, "Exam 2", new Date(2026, 9, 22), ["dka", "hf", "aki"], { qcount: 20 });
+
   if (which === "postexam") {
-    // Pharm Exam 2 fully studied, checkpoint taken, exam date passed, result not captured
     S.enroll.filter(e => e.classId === ph.id && ["card", "anti", "cort"].includes(e.topicId))
-      .forEach(e => { e.watch = e.review = e.quiz = true; e.quizScore = 70; e.quizAnswered = 10; e.quizCorrect = 7; });
+      .forEach(e => { e.watch = e.review = e.quiz = true; });
+    seedMastery("anti", 14, 9); seedMastery("cort", 11, 8);
     const x = examsOf(ph.id).find(e => e.name === "Exam 2");
-    x.checkpoint = { correct: 8, total: 12, score: 67, takenOn: "Oct 12",
-      perTopic: { card: { c: 2, t: 5 }, anti: { c: 3, t: 4 }, cort: { c: 3, t: 3 } } };
+    x.attempts = [{ score: 65, correct: 13, total: 20, fresh: 15, takenOn: "Oct 12",
+      perTopic: { card: { c: 3, t: 7 }, anti: { c: 5, t: 7 }, cort: { c: 5, t: 6 } } }];
     S.now = new Date(2026, 9, 16);
   }
 }
@@ -517,7 +597,7 @@ function actionMenu(id, items, label) {
 }
 function areaBlurb(catId) {
   const c = CAT(catId); if (!c) return "";
-  return `<div class="explain">We'll start you with a list of <b>${esc(c.name)}</b> topics to pick from. You can add topics from any other area too, plus any single video or guide you want to keep with this class.</div>`;
+  return `<div class="explain">We'll start you in <b>${esc(c.name)}</b>, organised into ${c.units.length} units like ${esc(c.units.slice(0,2).map(u=>u.n).join(" and "))}. Open a unit and pick the topics on your syllabus, or add a whole unit at once. You can pull topics from any other area too.</div>`;
 }
 
 function go(view, o) { R = Object.assign(R, { view, modal: null, menu: null }, o || {}); render(); }
@@ -526,6 +606,7 @@ function closeModal() { R.modal = null; render(); }
 
 /* ---- live resume state ---- */
 const watchedTopic = tid => S.enroll.some(e => e.topicId === tid && e.watch);
+const RECS_WARM = [["DKA vs HHS: Priorities", "Video · 14 min"], ["DKA vs HHS", "Study Guide PDF"], ["Endocrine quiz", "10 questions"]];
 const watchList = () => S.watch.filter(w => !watchedTopic(w.key));
 function jumpRows() {
   const rows = S.enroll
@@ -654,8 +735,9 @@ function screenHome() {
         ${cold ? "" : `<div class="card t">
           <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Recommended next</h2></div>
           <div class="sm" style="margin-bottom:8px">You watched two Endocrine videos this week.</div>
-          ${[["DKA vs HHS: Priorities", "Video · 14 min"], ["DKA vs HHS", "Study Guide PDF"], ["Endocrine quiz", "10 questions"]]
-            .map(x => `<div class="lrow" style="padding:9px 0"><div class="gr"><div class="t" style="font-size:13.5px">${esc(x[0])}</div><div class="m">${esc(x[1])}</div></div><button class="btn bo s" onclick="toast('Open')">Open</button></div>`).join("")}
+          ${RECS_WARM.map((x, i) => S.dismissed.includes(i) ? "" : `<div class="lrow" style="padding:9px 0"><div class="gr"><div class="t" style="font-size:13.5px">${esc(x[0])}</div><div class="m">${esc(x[1])}</div></div>
+            <button class="btn bo s" onclick="toast('Open')">Open</button>
+            <button class="xbtn" title="Not now" onclick="dismissRec(${i})">×</button></div>`).join("") || `<div class="sm">Nothing right now.</div>`}
         </div>`}
         <div class="card t">
           <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">News &amp; announcements</h2></div>
@@ -698,24 +780,14 @@ function screenClasses() {
 }
 /* ============================================================
    SCREEN — CLASS HOME
+   One topic list. The exam is a planning object, not a container.
    ============================================================ */
-function upNext(pool) {
-  const list = pool.filter(e => !eDone(e));
-  return list.filter(eStarted)[0] || list[0] || null;
-}
-
 function screenClass() {
   const c = cls(R.classId); if (!c) return `<div class="main"><div class="empty">Class not found.</div></div>`;
   const t = tierOf(c.id), es = enrollsOf(c.id), cat = c.cat ? CAT(c.cat) : null;
   const exams = examsOf(c.id).sort((a, b) => a.date - b.date);
   const up = nextExam(c.id), past = exams.filter(e => e.past);
-  const items = itemsOf(c.id);
-  const examIds = up ? up.topicIds : [];
-  const onExamAll = es.filter(e => examIds.includes(e.topicId));
-  const onExam = onExamAll.filter(e => !eDone(e));
-  const other = es.filter(e => !examIds.includes(e.topicId) && !eDone(e));
-  const done = es.filter(eDone);
-  const nx = upNext(onExamAll.length ? onExamAll : es);
+  const nx = upNext(es);
 
   return `<div class="main">
     <button class="backbtn" onclick="go('classes')">← My classes</button>
@@ -731,11 +803,10 @@ function screenClass() {
 
     <div class="split" style="margin-top:20px">
       <div>
-        ${t >= 2 ? examBlock(c, up, onExamAll, onExam, past, nx) : ""}
-        ${t >= 2 && other.length ? topicBlock(c, other, up ? "Other topics in this class" : "Topics in this class", up ? "Not on the next exam. Still tracked." : "Work through these at your own pace.", null, nx) : ""}
-        ${done.length ? topicBlock(c, done, "Completed topics", "Loop closed. Kept for the final and for the NCLEX.", examIds, null) : ""}
+        ${t >= 2 ? examBlock(c, up, es, past) : ""}
+        ${t >= 2 ? topicList(c, es, up, nx) : ""}
         ${t >= 2 ? quizPerf(c, es) : ""}
-        ${t >= 2 ? itemsBlock(c, items, cat) : ""}
+        ${t >= 2 ? itemsBlock(c, itemsOf(c.id), cat) : ""}
       </div>
       <div>
         ${past.length ? pastExams(past) : ""}
@@ -747,175 +818,210 @@ function screenClass() {
 
 /* --- TIER 1 --- */
 function tier1(c, cat) {
-  if (!cat) return `<div class="card stripe" style="margin-top:18px">
+  if (!cat) return `<div class="card" style="margin-top:18px">
     <div class="chead"><div><h2>What areas does this class cover?</h2><div class="sub">Pick one and this page fills in with the matching videos, guides and quizzes.</div></div></div>
     <div class="selectwrap" style="max-width:380px"><select onchange="setCat('${c.id}',this.value)">
       <option value="">Choose an area</option>
       ${CATS.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join("")}
-    </select></div>
-  </div>`;
+    </select></div></div>`;
 
-  const recs = cat.topics.slice(0, 6);
-  return `<div class="card stripe" style="margin-top:18px">
+  return `<div class="card" style="margin-top:18px">
     <div class="chead"><div><h2>Start here</h2><div class="sub">Pick the topics you need. Each one gives you a video, a study guide and a quiz, and tracks your progress in this class.</div></div></div>
-    <div class="sm" style="font-weight:700;margin-bottom:9px">Most-studied ${esc(cat.name)} topics</div>
-    <div class="sm" style="margin:-4px 0 10px">Not seeing what's on your syllabus? Browse all topics, or save a single video or guide to this class.</div>
-    ${recs.map(tp => `<div class="pick" onclick="quickAdd('${c.id}','${tp.id}')">
-      <div class="cbx"></div><div class="n">${esc(tp.n)}</div>
-      <span class="btn bt s">Add</span></div>`).join("")}
+    ${cat.units.map(u => `<div class="unitrow">
+      <div><div class="un">${esc(u.n)}</div><div class="sm">${u.topics.map(x => esc(x.n)).join(" · ")}</div></div>
+      <div class="sm">${u.topics.length} topic${u.topics.length === 1 ? "" : "s"}</div>
+    </div>`).join("")}
     <div class="btw mt">
-      <button class="btn bo s" onclick="openModal('addtopics',{sel:[]})">Browse all topics</button>
-      <button class="btn bg s" onclick="toast('Study guides, filtered to this class')">Study guides</button>
+      <button class="btn bp s" onclick="openModal('addtopics',{sel:[]})">Pick your topics</button>
+      <button class="btn bo s" onclick="addAllCat('${c.id}')">Add all ${catTopics(cat.id).length} ${esc(cat.name)} topics</button>
     </div>
   </div>`;
 }
 
-/* --- EXAMS --- */
-function examBlock(c, up, onExamAll, onExam, past, nx) {
-  const closed = past.length && !up;
-  if (!up) return `<div class="card stripe-yellow">
-    <div class="chead"><div><h2>Exams</h2><div class="sub">${closed ? "Nothing on the calendar right now." : "Nothing coming up yet."}</div></div></div>
-    <div class="sm" style="margin-bottom:14px">Got an exam coming up? Add it and we'll group the topics it covers, then check whether you're ready before test day.</div>
-    <button class="btn bp s" onclick="openModal('addexam',{d:{ids:[],lib:[]}})">+ Add ${closed ? "your next" : "an"} exam</button></div>`;
+/* --- EXAM: planning object that produces a readiness quiz --- */
+function examBlock(c, up, es, past) {
+  if (!up) return `<div class="card">
+    <div class="chead"><div><h2>Next exam</h2><div class="sub">${past.length ? "Nothing on the calendar right now." : "Nothing set up yet."}</div></div></div>
+    <div class="sm" style="margin-bottom:14px">Tell us when your next exam is and what's on it, and we'll build you a readiness quiz that mixes questions from all of those topics.</div>
+    <button class="btn bp s" onclick="openModal('addexam',{d:{ids:[],lib:[],qcount:20}})">+ Add your ${past.length ? "next" : "first"} exam</button></div>`;
 
-  const nDone = onExamAll.filter(eDone).length;
-  const allDone = onExamAll.length && nDone === onExamAll.length;
-  const d = daysTo(up.date);
-  const cp = up.checkpoint;
-  const overdue = d < 0;
+  const onEx = es.filter(e => up.topicIds.includes(e.topicId));
+  const nDone = onEx.filter(eDone).length;
+  const d = daysTo(up.date), overdue = d < 0;
+  const att = lastAttempt(up);
+  const perT = Math.floor(up.qcount / Math.max(1, up.topicIds.length));
 
-  return `<div class="card">
+  return `<div class="card exam">
     <div class="chead">
       <div><h2>${esc(up.name)} · ${fmt(up.date)}</h2>
-        <div class="sub">${overdue ? "Waiting on your result" : `In ${d} day${d === 1 ? "" : "s"}`} · <b>${nDone} of ${onExamAll.length}</b> topics complete</div></div>
+        <div class="sub">${overdue ? "Waiting on your result" : d === 0 ? "Today" : `In ${d} day${d === 1 ? "" : "s"}`} · ${up.topicIds.length} topic${up.topicIds.length === 1 ? "" : "s"} · <b>${nDone} of ${onEx.length}</b> studied</div></div>
       ${examMenu(c, up)}
     </div>
 
-    ${onExam.length ? onExam.map(e => topicCard(e, { isNext: nx && nx.id === e.id })).join("")
-      : onExamAll.length ? `<div class="banner" style="margin-top:0"><b>All ${onExamAll.length} topics complete.</b> They've moved down to Completed topics.</div>`
-      : `<div class="sm">No topics on this exam yet.</div>`}
+    <div class="examtopics">
+      ${up.topicIds.map(tid => {
+        const e = es.find(z => z.topicId === tid);
+        const done = e && eDone(e);
+        return `<span class="etchip ${done ? "dn" : ""}" onclick="R.filter='exam';render();scrollTopics()">${done ? "✓ " : ""}${esc(ALLTOPICS[tid].n)}</span>`;
+      }).join("")}
+      <button class="btn bt s" onclick="openModal('addexam',{d:{id:up.id,name:up.name,ids:up.topicIds.slice(),lib:[],qcount:up.qcount,date:up.date}})">Edit</button>
+    </div>
 
     <div class="hr"></div>
-    ${cp ? checkpointResult(up, cp) : `
-      <div class="btw">
-        <div><h3>Readiness check</h3><div class="sm">${allDone
-          ? "All topics done. Take a mixed quiz across everything on this exam."
-          : `A mixed quiz across all ${onExamAll.length} topics, so you know where you stand before test day.`}</div></div>
-        ${allDone
-          ? `<button class="btn bp" onclick="go('check',{examId:'${up.id}'})">Start readiness check</button>`
-          : `<span class="tip" data-tip="You haven't finished all your topics yet. You can still take it — we'll show you where you stand."><button class="btn bb" onclick="confirmEarlyCheck('${up.id}')">Start readiness check</button></span>`}
+
+    ${att ? attemptResult(up, att) : `
+      <div class="btw" style="align-items:flex-end">
+        <div style="flex:1">
+          <h3>Readiness quiz</h3>
+          <div class="sm" style="margin-top:2px">A mixed quiz across all ${up.topicIds.length} topics on ${esc(up.name)}, so you know where you stand. ${READY_BAR}% or better means you're ready.</div>
+          ${qcountNote(up)}
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div><label class="qlab">Questions</label>
+            <div class="selectwrap"><select onchange="setQCount('${up.id}',this.value)">
+              ${[5,10,15,20,25,30,40].map(n => `<option value="${n}" ${up.qcount === n ? "selected" : ""}>${n}</option>`).join("")}
+            </select></div></div>
+          <button class="btn bp" onclick="startQuiz({kind:'readiness',examId:'${up.id}'})">Start readiness quiz</button>
+        </div>
       </div>`}
-    ${overdue && !up.result ? `<div class="banner w" style="margin-top:14px"><b>Did you take ${esc(up.name)}?</b> Tell us how it went so we can close the loop.<span class="cta" onclick="openModal('result',{examId:'${up.id}'})">Add result →</span></div>` : ""}
+
+    ${overdue && !up.result ? `<div class="banner w" style="margin-top:14px"><b>Did you take ${esc(up.name)}?</b> Add your result to close it out and set up your next one.<span class="cta" onclick="openModal('result',{examId:'${up.id}'})">Add result →</span></div>` : ""}
   </div>`;
 }
 
+function qcountNote(x) {
+  const per = x.qcount / Math.max(1, x.topicIds.length);
+  if (!x.topicIds.length) return "";
+  if (per >= MIN_PER_TOPIC) return `<div class="sm ok" style="margin-top:6px">${x.qcount} questions across ${x.topicIds.length} topics is about ${Math.floor(per)} each — enough to show you where you're weak.</div>`;
+  const need = MIN_PER_TOPIC * x.topicIds.length;
+  return `<div class="sm warn" style="margin-top:6px">${x.qcount} questions across ${x.topicIds.length} topics is only ${Math.floor(per)} each. We need ${MIN_PER_TOPIC} per topic to rank your weak spots — try ${need}.</div>`;
+}
+
 function examMenu(c, up) {
-  const items = [];
-  if (up) {
-    items.push({ label: "Edit this exam", fn: `openModal('addexam',{d:{id:'${up.id}',name:'${esc(up.name)}',ids:${JSON.stringify(up.topicIds)},lib:[],date:new Date('${up.date.toISOString()}')}})` });
-    items.push({ label: "Add exam result", fn: `openModal('result',{examId:'${up.id}'})` });
-    items.push({ label: "+ Add an exam", off: true });
-    items.push({ hint: `Finish ${esc(up.name)} first. Add its result and the next one opens up.` });
-  } else {
-    items.push({ label: "+ Add an exam", fn: "openModal('addexam',{d:{ids:[],lib:[]}})" });
-  }
+  const items = [
+    { label: "Edit this exam", fn: `openModal('addexam',{d:{id:'${up.id}',name:'${esc(up.name)}',ids:${JSON.stringify(up.topicIds)},lib:[],qcount:${up.qcount},date:new Date('${up.date.toISOString()}')}})` },
+    { label: "Add exam result", fn: `openModal('result',{examId:'${up.id}'})` },
+    { label: "+ Add an exam", off: true },
+    { hint: `Add a result for ${esc(up.name)} and the next one opens up.` }
+  ];
   return actionMenu("exam-" + c.id, items, "Exam options");
 }
 
-function checkpointResult(x, cp) {
-  const band = cp.score >= 75 ? "ok" : cp.score >= 60 ? "mid" : "low";
-  const label = cp.score >= 75 ? "On track" : cp.score >= 60 ? "Almost there" : "Keep studying";
-  const rows = Object.entries(cp.perTopic).map(([tid, v]) => ({ tid, ...v, pc: Math.round(v.c / v.t * 100) }))
-    .sort((a, b) => a.pc - b.pc);
-  return `<div class="band ${band}">
-    <div class="btw"><div><div class="eb" style="color:inherit;opacity:.7">Readiness check · ${esc(cp.takenOn)}</div>
-      <h2 style="margin-top:3px">${label} — ${cp.score}%</h2>
-      <div class="sm" style="margin-top:3px">${cp.correct} of ${cp.total} correct across ${Object.keys(cp.perTopic).length} topics. This is a review check on questions from your topics, not a prediction of your exam score.</div></div>
-      <button class="btn bg s" onclick="go('check',{examId:'${x.id}'})">Retake</button></div>
+function attemptResult(x, a) {
+  const ready = a.score >= READY_BAR;
+  const rows = Object.entries(a.perTopic).map(([tid, v]) => ({ tid, ...v, pc: Math.round(v.c / v.t * 100) })).sort((p, q) => p.pc - q.pc);
+  return `<div class="band ${ready ? "ok" : "low"}">
+    <div class="btw"><div>
+      <div class="eb" style="color:inherit;opacity:.7">Readiness quiz · ${esc(a.takenOn)}${x.attempts.length > 1 ? ` · attempt ${x.attempts.length}` : ""}</div>
+      <h2 style="margin-top:3px">${ready ? "You're ready" : "Not ready yet"} — ${a.score}%</h2>
+      <div class="sm" style="margin-top:3px">${a.correct} of ${a.total} correct. ${READY_BAR}% is the bar.${a.fresh < a.total ? ` ${a.fresh} of these were new questions; we're running low on unseen ones for these topics.` : ""}</div>
+    </div>
+    <button class="btn bg s" onclick="startQuiz({kind:'readiness',examId:'${x.id}'})">Retake</button></div>
   </div>
   <h3 style="margin-bottom:6px">Where you're weakest</h3>
-  <div class="sm" style="margin-bottom:8px">Ranked by your score inside this exam's topics.</div>
-  ${rows.map(r => r.t < 5
-    ? `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="sm" style="flex:1">Only ${r.t} questions answered. Not enough to rank yet.</div><button class="btn bg s" onclick="toast('More practice')">More practice</button></div>`
+  <div class="sm" style="margin-bottom:8px">Across the topics on ${esc(x.name)}.</div>
+  ${rows.map(r => r.t < MIN_PER_TOPIC
+    ? `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="sm" style="flex:1">Only ${r.t} question${r.t === 1 ? "" : "s"} on this topic. Not enough to rank — add more questions and retake.</div></div>`
     : `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div>
-       <div class="bar p"><i style="width:${r.pc}%"></i></div>
-       <span class="scpill ${r.pc >= 75 ? "ok" : ""}">${r.pc}%</span>
-       <span class="sm" style="width:110px">${r.c} of ${r.t} questions</span>
-       <button class="btn bo s" onclick="remediate('${x.id}','${r.tid}')">Redo the quiz</button></div>`).join("")}`;
+       <div class="bar ${r.pc >= READY_BAR ? "g" : "p"}"><i style="width:${r.pc}%"></i></div>
+       <span class="scpill ${r.pc >= READY_BAR ? "ok" : ""}">${r.pc}%</span>
+       <span class="sm" style="width:104px">${r.c} of ${r.t}</span>
+       <button class="btn bo s" onclick="restudy('${x.id}','${r.tid}')">Restudy</button></div>`).join("")}`;
 }
 
 function pastExams(past) {
   return `<div class="card t">
     <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Past exams</h2></div>
-    ${past.map(x => `<div class="lrow" style="padding:10px 0"><div class="gr">
+    ${past.map(x => { const a = lastAttempt(x); return `<div class="lrow" style="padding:10px 0"><div class="gr">
       <div class="t" style="font-size:13.5px">${esc(x.name)} · ${fmt(x.date)}</div>
-      <div class="m">${x.checkpoint ? `Scored ${x.checkpoint.score}% on your readiness check` : "No readiness check taken"}${x.result ? ` · you reported <b>${esc(x.result.grade)}%</b> on the real exam` : " · no result added"}</div>
-    </div>${x.result ? `<span class="chip cg">${esc(x.result.outcome)}</span>` : `<button class="btn bo s" onclick="openModal('result',{examId:'${x.id}'})">Add result</button>`}</div>`).join("")}
+      <div class="m">${a ? `Scored ${a.score}% on your readiness quiz` : "No readiness quiz taken"}${x.result ? ` · you reported <b>${esc(x.result.grade)}%</b> on the real exam` : " · no result added"}</div>
+    </div>${x.result ? `<span class="chip cg">${esc(x.result.outcome)}</span>` : `<button class="btn bo s" onclick="openModal('result',{examId:'${x.id}'})">Add result</button>`}</div>`; }).join("")}
   </div>`;
 }
 
-/* --- TOPIC LISTS --- */
-function topicBlock(c, list, title, sub, examIds, nx) {
-  return `<div class="card">
-    <div class="chead"><div><h2>${esc(title)}</h2><div class="sub">${esc(sub)}</div></div>
-      ${actionMenu("tb-" + title.replace(/\s+/g, ""), [
+/* --- ONE topic list. Completed topics stay put. --- */
+function topicList(c, es, up, nx) {
+  const filter = R.filter || "all";
+  let list = es.slice();
+  if (filter === "exam" && up) list = list.filter(e => up.topicIds.includes(e.topicId));
+  if (R.hideDone) list = list.filter(e => !eDone(e));
+  const nDone = es.filter(eDone).length;
+
+  const byUnit = {};
+  list.forEach(e => { const u = topicOf(e).unit; (byUnit[u] = byUnit[u] || []).push(e); });
+
+  return `<div class="card" id="topics">
+    <div class="chead">
+      <div><h2>Topics</h2><div class="sub">${nDone} of ${es.length} complete. Watch, read and quiz in whatever order works for you.</div></div>
+      ${actionMenu("tb-" + c.id, [
         { label: "Add topics", fn: "openModal('addtopics',{sel:[]})" },
-        { label: "Browse the library", fn: "toast('Video lessons, filtered to this class')" }
-      ], "+ Add")}</div>
-    ${list.length ? list.map(e => topicCard(e, { onExam: examIds && examIds.includes(e.topicId), isNext: nx && nx.id === e.id })).join("") : `<div class="sm">Nothing here.</div>`}
+        { label: R.hideDone ? "Show completed topics" : "Hide completed topics", fn: "R.hideDone=!R.hideDone;render()" },
+        { label: "Build a quiz from this class", fn: "openModal('classquiz',{sel:[],n:20})" }
+      ], "+ Add")}
+    </div>
+
+    ${up ? `<div class="filters">
+      <button class="fchip ${filter === "all" ? "on" : ""}" onclick="R.filter='all';render()">All topics ${es.length}</button>
+      <button class="fchip ${filter === "exam" ? "on" : ""}" onclick="R.filter='exam';render()">On ${esc(up.name)} ${up.topicIds.length}</button>
+    </div>` : ""}
+
+    <div class="legend"><span class="lg-bars"><i></i><i></i><i></i></span> video · guide · quiz</div>
+
+    ${Object.keys(byUnit).length
+      ? Object.entries(byUnit).map(([uid2, arr]) => `
+        <div class="unitlbl">${esc(ALLUNITS[uid2].n)}</div>
+        ${arr.map(e => topicCard(e, { isNext: nx && nx.id === e.id, examName: up && up.topicIds.includes(e.topicId) ? up.name : null })).join("")}`).join("")
+      : `<div class="sm">Nothing to show with this filter.</div>`}
   </div>`;
 }
 
 function nextStepOf(e) {
   const tp = topicOf(e);
-  if (!e.watch) return { key: "watch", cta: "Watch video", meta: `Next: watch ${tp.v}` };
-  if (!e.review) return { key: "review", cta: "Open guide", meta: "Next: read the study guide" };
-  if (!e.quiz) return { key: "quiz", cta: "Start quiz", meta: `Next: the ${tp.q}-question quiz` };
+  if (!e.watch) return { key: "watch", cta: "Watch video", meta: `${tp.d} video` };
+  if (!e.review) return { key: "review", cta: "Open guide", meta: "Study guide" };
+  if (!e.quiz) return { key: "quiz", cta: "Start quiz", meta: `${tp.q} questions` };
   return null;
 }
+
 function topicCard(e, o) {
   o = o || {};
-  const tp = topicOf(e), n = stepsDone(e);
+  const tp = topicOf(e), n = stepsDone(e), ns = nextStepOf(e);
+  const pc = masteryPct(e.topicId);
   const st = n === 3 ? "dn" : n > 0 ? "ip" : "";
-  const stat = n === 3 ? "COMPLETE" : n > 0 ? "IN PROGRESS" : "NOT STARTED";
-  const ns = o.isNext ? nextStepOf(e) : null;
   return `<div class="tcard ${st} ${o.isNext ? "next" : ""}">
-    <div class="lead">
-      <div style="display:flex;gap:6px;margin-bottom:4px">
-        ${o.isNext ? `<span class="chip cb">UP NEXT</span>` : `<span class="chip ${n === 3 ? "cg" : n > 0 ? "cl" : "cn"}">${stat}</span>`}
-        ${o.onExam ? `<span class="chip cl">ON THIS EXAM</span>` : ""}</div>
-      <div class="nm" onclick="go('topic',{enrollId:'${e.id}'})">${esc(tp.n)}</div>
-      <div class="muted">${ns ? esc(ns.meta) : e.quizScore !== null ? `Quiz best ${e.quizScore}%` : `${tp.q} questions available`}</div>
+    <div class="lead" onclick="go('topic',{enrollId:'${e.id}'})">
+      ${o.isNext || o.examName || n === 3 ? `<div class="chiprow">
+        ${o.isNext ? `<span class="chip cb">UP NEXT</span>` : ""}
+        ${n === 3 ? `<span class="chip cg">COMPLETE</span>` : ""}
+        ${o.examName ? `<span class="chip cl">ON ${esc(o.examName.toUpperCase())}</span>` : ""}</div>` : ""}
+      <div class="nm">${esc(tp.n)}</div>
+      <div class="muted">${ns ? esc(ns.meta) : "All three done"}${pc !== null ? ` · ${pc}% on ${mastery(e.topicId).answered} questions` : ""}</div>
     </div>
     <div class="rt">
-      <div class="steps">
-        <span class="step ro ${e.watch ? "dn" : "td"}">WATCH</span>
-        <span class="step ro ${e.review ? "dn" : "td"}">REVIEW</span>
-        <span class="step ro ${e.quiz ? "dn" : "td"}">QUIZ</span>
-      </div>
+      <span class="bars" title="video · guide · quiz">
+        <i class="${e.watch ? "on" : ""}"></i><i class="${e.review ? "on" : ""}"></i><i class="${e.quiz ? "on" : ""}"></i>
+      </span>
       ${ns
-        ? `<button class="btn bp s" onclick="${ns.key === "quiz" ? `go('check',{examId:'topic:${e.id}'})` : `doStep('${e.id}','${ns.key}')`}">${esc(ns.cta)}</button>`
-        : `<button class="btn bo s" onclick="go('topic',{enrollId:'${e.id}'})">Open</button>`}
+        ? `<button class="btn ${o.isNext ? "bp" : "bo"} s" onclick="${ns.key === "quiz" ? `startQuiz({kind:'topic',enrollId:'${e.id}'})` : `doStep('${e.id}','${ns.key}')`}">${esc(ns.cta)}</button>`
+        : `<button class="btn bg s" onclick="go('topic',{enrollId:'${e.id}'})">Review</button>`}
     </div></div>`;
 }
 
+/* --- quiz performance, from global mastery --- */
 function quizPerf(c, es) {
-  const scored = es.filter(e => e.quizScore !== null).sort((a, b) => a.quizScore - b.quizScore);
+  const scored = es.map(e => ({ e, pc: masteryPct(e.topicId) })).filter(r => r.pc !== null).sort((a, b) => a.pc - b.pc);
   return `<div class="card">
-    <div class="chead"><div><h2>Quiz performance</h2><div class="sub">Everything here comes from questions you answered inside <b>${esc(c.name)}</b>.</div></div>
+    <div class="chead"><div><h2>Quiz performance</h2><div class="sub">Every question you've answered on these topics counts, wherever you answered it.</div></div>
       ${actionMenu("qp-" + c.id, [
-        { label: "Build a quiz from this class", fn: `toast('Quiz builder, pre-filtered to ${esc(c.name)}')` },
+        { label: "Build a quiz from this class", fn: "openModal('classquiz',{sel:[],n:20})" },
         { label: "See all your quiz results", fn: "toast('Quiz insights')" }
       ], "Options")}</div>
-    ${scored.length ? `
-      <h3 style="margin-bottom:4px">Performance by topic</h3>
-      <div class="sm" style="margin-bottom:9px">Where you are strong and where you are not, inside this class.</div>
-      ${scored.map(e => `<div class="wkrow"><div class="nm">${esc(topicOf(e).n)}</div>
-        <div class="bar ${e.quizScore >= 75 ? "g" : "p"}"><i style="width:${e.quizScore}%"></i></div>
-        <span class="scpill ${e.quizScore >= 75 ? "ok" : ""}">${e.quizScore}%</span>
-        <span class="sm" style="width:110px">${e.quizCorrect} of ${e.quizAnswered} questions</span>
-        <button class="btn bo s" onclick="go('topic',{enrollId:'${e.id}'})">Open topic</button></div>`).join("")}
-    ` : `<div class="sm">No quizzes taken in this class yet. Take a topic quiz and your scores show up here.</div>`}
+    ${scored.length ? scored.map(r => `<div class="wkrow"><div class="nm">${esc(topicOf(r.e).n)}</div>
+      <div class="bar ${r.pc >= READY_BAR ? "g" : "p"}"><i style="width:${r.pc}%"></i></div>
+      <span class="scpill ${r.pc >= READY_BAR ? "ok" : ""}">${r.pc}%</span>
+      <span class="sm" style="width:104px">${mastery(r.e.topicId).correct} of ${mastery(r.e.topicId).answered}</span>
+      <button class="btn bo s" onclick="go('topic',{enrollId:'${r.e.id}'})">Open topic</button></div>`).join("")
+      : `<div class="sm">No questions answered on these topics yet. Take a topic quiz or build one from this class.</div>`}
   </div>`;
 }
 
@@ -931,15 +1037,16 @@ function itemsBlock(c, items, cat) {
 }
 
 function glance(c, es) {
-  const q = es.filter(e => e.quiz).length, w = es.filter(e => e.watch).length;
-  const sc = es.filter(e => e.quizScore !== null);
-  const avg = sc.length ? Math.round(sc.reduce((s, e) => s + e.quizScore, 0) / sc.length) : null;
+  const w = es.filter(e => e.watch).length, q = es.filter(e => e.quiz).length;
+  const ms = es.map(e => mastery(e.topicId)).filter(Boolean);
+  const ans = ms.reduce((s, m) => s + m.answered, 0), cor = ms.reduce((s, m) => s + m.correct, 0);
   return `<div class="card t">
     <div class="chead" style="margin-bottom:6px"><h2 style="font-size:16px">This class at a glance</h2></div>
     <div class="kv"><span>Topics tracked</span><b>${es.length}</b></div>
     <div class="kv"><span>Videos watched</span><b>${w}</b></div>
-    <div class="kv"><span>Quizzes taken</span><b>${q}</b></div>
-    <div class="kv"><span>Avg quiz score</span><b>${avg === null ? "—" : avg + "%"}</b></div>
+    <div class="kv"><span>Topics quizzed</span><b>${q}</b></div>
+    <div class="kv"><span>Questions answered</span><b>${ans}</b></div>
+    <div class="kv"><span>Overall score</span><b>${ans ? Math.round(cor / ans * 100) + "%" : "—"}</b></div>
   </div>`;
 }
 
@@ -952,21 +1059,22 @@ function screenTopic() {
   const x = examsOf(c.id).find(z => z.topicIds.includes(e.topicId) && !z.past);
   const sibs = enrollsOf(c.id), i = sibs.findIndex(z => z.id === e.id);
   const others = S.enroll.filter(z => z.topicId === e.topicId && z.classId !== e.classId);
+  const pc = masteryPct(e.topicId), m = mastery(e.topicId);
 
   const step = (key, label, title, meta, cta) => `
-    <div class="tcard ${e[key] ? "dn" : ""}" style="grid-template-columns:120px 1fr auto">
+    <div class="tcard ${e[key] ? "dn" : ""}" style="grid-template-columns:112px 1fr auto">
       <div class="lead" style="justify-content:center"><span class="chip ${e[key] ? "cg" : "cl"}">${label}</span></div>
       <div style="padding:14px 4px"><div style="font-weight:700;font-size:15px">${esc(title)}</div><div class="muted">${esc(meta)}</div></div>
-      <div class="rt"><button class="btn ${e[key] ? "bg" : "bb"} s" onclick="${key === "quiz" ? `go('check',{examId:'topic:${e.id}'})` : `doStep('${e.id}','${key}')`}">${e[key] ? (key === "quiz" ? "Retake quiz" : key === "watch" ? "Watch again" : "Open again") : cta}</button></div>
+      <div class="rt"><button class="btn ${e[key] ? "bg" : "bb"} s" onclick="${key === "quiz" ? `startQuiz({kind:'topic',enrollId:'${e.id}'})` : `doStep('${e.id}','${key}')`}">${e[key] ? (key === "quiz" ? "Retake quiz" : key === "watch" ? "Watch again" : "Open again") : cta}</button></div>
     </div>`;
 
   return `<div class="main">
     <button class="backbtn" onclick="go('class',{classId:'${c.id}'})">← ${esc(c.name)}</button>
     <div class="btw" style="align-items:flex-start">
       <div>
-        <div class="eb">${esc(c.name)}${x ? ` · on ${esc(x.name)}` : ""}</div>
+        <div class="eb">${esc(c.name)} · ${esc(tp.unitName)}${x ? ` · on ${esc(x.name)}` : ""}</div>
         <h1 style="margin-top:4px">${esc(tp.n)}</h1>
-        <div class="sub" style="margin-top:5px">${n} of 3 steps done${e.quizScore !== null ? ` · quiz best ${e.quizScore}%` : ""}${x ? ` · exam ${fmt(x.date)}` : ""}</div>
+        <div class="sub" style="margin-top:5px">${n} of 3 done${pc !== null ? ` · ${pc}% across ${m.answered} questions` : ""}${x ? ` · exam ${fmt(x.date)}` : ""}</div>
       </div>
       <div style="display:flex;gap:8px">
         ${i > 0 ? `<button class="btn bg s" onclick="go('topic',{enrollId:'${sibs[i - 1].id}'})">← Previous</button>` : ""}
@@ -977,24 +1085,24 @@ function screenTopic() {
     <div class="split" style="margin-top:18px">
       <div>
         <div class="card">
-          <div class="chead"><div><h2>${n === 3 ? "You're done with this topic" : "Work through it"}</h2><div class="sub">Watch, review, quiz. Nothing here is gated on a score.</div></div></div>
-          ${step("watch", "WATCH", tp.v, `Video · ${tp.d}`, "Watch video")}
-          ${step("review", "REVIEW", tp.n + " study guide", "Study Guide PDF", "Open guide")}
+          <div class="chead"><div><h2>Everything on this topic</h2><div class="sub">Start wherever you want. Nothing is locked.</div></div></div>
+          ${step("watch", "VIDEO", tp.v, `${tp.d} video`, "Watch video")}
+          ${step("review", "GUIDE", tp.n + " study guide", "Study Guide PDF", "Open guide")}
           ${step("quiz", "QUIZ", tp.n + " quiz", `${tp.q} questions`, "Start quiz")}
         </div>
 
-        ${others.length ? `<div class="card stripe-yellow">
-          <div class="chead"><div><h2>You've studied this topic before</h2><div class="sub">Same topic, different class. Kept separate on purpose.</div></div></div>
+        ${others.length ? `<div class="card">
+          <div class="chead"><div><h2>You've studied this topic in another class</h2><div class="sub">Your steps are tracked per class. Your quiz score is the same everywhere.</div></div></div>
           ${others.map(o => { const oc = cls(o.classId); return `<div class="lrow"><div class="ico">${esc(oc.name[0])}</div>
-            <div class="gr"><div class="t">${esc(oc.name)}</div><div class="m">${stepsDone(o)} of 3 steps${o.quizScore !== null ? ` · quiz best ${o.quizScore}%` : ""} · added ${esc(o.added)}</div></div>
+            <div class="gr"><div class="t">${esc(oc.name)}</div><div class="m">${stepsDone(o)} of 3 done · added ${esc(o.added)}</div></div>
             <button class="btn bo s" onclick="go('topic',{enrollId:'${o.id}'})">See that work</button></div>`; }).join("")}
         </div>` : ""}
 
         <div class="card">
-          <div class="chead"><div><h2>More on ${esc(tp.n)}</h2><div class="sub">Extra material on this topic, beyond the three steps above.</div></div></div>
-          ${[["Nurse Mike cram session: " + tp.catName, "Video · 22 min"],
-             [tp.n + " flashcards", "48 cards"],
-             [tp.catName + " lab values sheet", "Study Guide PDF"]]
+          <div class="chead"><div><h2>More on ${esc(tp.n)}</h2><div class="sub">Extra material beyond the three above.</div></div></div>
+          ${[["Nurse Mike cram session: " + tp.unitName, "Video · 22 min"],
+             [tp.unitName + " overview", "Study Guide PDF"],
+             ["Related: " + (CAT(tp.cat).units.find(u => u.id === tp.unit).topics.filter(z => z.id !== tp.id)[0] || tp).n, "Topic"]]
             .map(r => `<div class="lrow"><div class="ico">▶</div><div class="gr"><div class="t">${esc(r[0])}</div><div class="m">${esc(r[1])}</div></div><button class="btn bo s" onclick="toast('Open')">Open</button></div>`).join("")}
         </div>
       </div>
@@ -1003,9 +1111,9 @@ function screenTopic() {
         <div class="card t">
           <div class="chead" style="margin-bottom:8px"><h2 style="font-size:16px">Progress</h2></div>
           <div class="seg mb">${["watch", "review", "quiz"].map(k => `<span class="${e[k] ? "d" : ""}"></span>`).join("")}</div>
-          <div class="kv"><span>Steps</span><b>${n} of 3</b></div>
-          <div class="kv"><span>Quiz best</span><b>${e.quizScore === null ? "—" : e.quizScore + "%"}</b></div>
-          <div class="kv"><span>Added</span><b>${esc(e.added)}</b></div>
+          <div class="kv"><span>Steps in ${esc(c.name)}</span><b>${n} of 3</b></div>
+          <div class="kv"><span>Questions answered</span><b>${m ? m.answered : 0}</b></div>
+          <div class="kv"><span>Score on this topic</span><b>${pc === null ? "—" : pc + "%"}</b></div>
           <div style="margin-top:12px"><button class="btn bg s" style="width:100%" onclick="removeEnroll('${e.id}')">Remove from ${esc(c.name)}</button></div>
         </div>
         <div class="card t">
@@ -1017,58 +1125,79 @@ function screenTopic() {
   </div>`;
 }
 /* ============================================================
-   CHECKPOINT / QUIZ RUNNER
+   QUIZ ENGINE
+   Questions interleave across topics, never blocked.
+   Retakes prefer questions the student hasn't seen.
+   Every answer writes to global topic mastery.
    ============================================================ */
 const STEMS = [
   ["A client is prescribed {T}. Which finding requires immediate follow-up?", ["Blood pressure 138/86", "Heart rate 44 and irregular", "Reports mild headache", "Urine output 45 mL/hr"], 1],
   ["Which statement about {T} indicates the client understands teaching?", ["\"I'll stop as soon as I feel better.\"", "\"I'll double the dose if I miss one.\"", "\"I'll call before taking anything new.\"", "\"I'll skip it on days I feel fine.\""], 2],
   ["The nurse is planning care related to {T}. Which action is the priority?", ["Document the finding", "Assess airway and breathing", "Notify the family", "Reposition the client"], 1],
   ["Which lab result is most concerning for a client with {T}?", ["Potassium 5.9 mEq/L", "Sodium 140 mEq/L", "Hemoglobin 13 g/dL", "Glucose 96 mg/dL"], 0],
-  ["A client with {T} reports new symptoms. What should the nurse do first?", ["Administer a PRN medication", "Reassess vital signs", "Chart the complaint", "Call the provider"], 1]
+  ["A client with {T} reports new symptoms. What should the nurse do first?", ["Administer a PRN medication", "Reassess vital signs", "Chart the complaint", "Call the provider"], 1],
+  ["Which client with {T} should the nurse assess first?", ["Ambulating with no complaints", "New onset confusion and low BP", "Asking about discharge teaching", "Requesting a snack"], 1],
+  ["The nurse is delegating care for a client with {T}. Which task is appropriate for the UAP?", ["Assessing lung sounds", "Recording intake and output", "Teaching about medications", "Evaluating the care plan"], 1],
+  ["A client with {T} is being discharged. Which instruction is most important?", ["Resume all activity immediately", "Report new shortness of breath", "Stop all medications when symptoms ease", "Avoid all fluids after 6pm"], 1]
 ];
+const qKey = (tid, i) => tid + "#" + i;
+
 function buildQuiz(topicIds, n) {
+  // Rank stems per topic: unseen first, then least recently used.
+  const pools = topicIds.map(tid => {
+    const seen = (mastery(tid) || { seen: [] }).seen;
+    const idx = STEMS.map((_, i) => i);
+    const unseen = idx.filter(i => !seen.includes(qKey(tid, i)));
+    const rest = idx.filter(i => seen.includes(qKey(tid, i)));
+    return { tid, order: unseen.concat(rest), unseenCount: unseen.length, ptr: 0 };
+  });
   const qs = [];
-  let i = 0;
-  while (qs.length < n) {
-    const tid = topicIds[qs.length % topicIds.length];
-    const s = STEMS[i % STEMS.length];
-    qs.push({ tid, q: s[0].replace("{T}", ALLTOPICS[tid].n.toLowerCase()), opts: s[1], a: s[2] });
-    i++;
+  let guard = 0;
+  while (qs.length < n && guard++ < n * 4) {
+    const p = pools[qs.length % pools.length];
+    const si = p.order[p.ptr % p.order.length]; p.ptr++;
+    const s = STEMS[si];
+    qs.push({ tid: p.tid, si, key: qKey(p.tid, si), q: s[0].replace("{T}", ALLTOPICS[p.tid].n.toLowerCase()), opts: s[1], a: s[2],
+      fresh: p.ptr <= p.unseenCount });
   }
   return qs;
 }
 
-function screenCheck() {
-  const isTopic = String(R.examId).startsWith("topic:");
-  let title, sub, topicIds, backTo, x = null, e = null;
-  if (isTopic) {
-    e = enrById(R.examId.split(":")[1]); const tp = topicOf(e);
-    title = tp.n + " quiz"; sub = `A short quiz drawn from this topic's bank.`; topicIds = [e.topicId];
-    backTo = `go('topic',{enrollId:'${e.id}'})`;
+function startQuiz(ctx) {
+  let topicIds = [], n = 10, title = "", sub = "";
+  if (ctx.kind === "topic") {
+    const e = enrById(ctx.enrollId); topicIds = [e.topicId]; n = Math.min(8, ALLTOPICS[e.topicId].q);
+    title = topicOf(e).n + " quiz"; sub = "Questions on this one topic.";
+  } else if (ctx.kind === "readiness") {
+    const x = S.exams.find(z => z.id === ctx.examId);
+    topicIds = x.topicIds; n = x.qcount;
+    title = x.name + " readiness quiz";
+    sub = `${n} questions mixed across your ${topicIds.length} exam topics. ${READY_BAR}% or better means you're ready.`;
   } else {
-    x = S.exams.find(z => z.id === R.examId); const c = cls(x.classId);
-    title = `${x.name} readiness check`; sub = `A mixed quiz across all ${x.topicIds.length} topics on this exam.`;
-    topicIds = x.topicIds; backTo = `go('class',{classId:'${c.id}'})`;
+    topicIds = ctx.topicIds; n = ctx.n;
+    title = "Quiz · " + cls(ctx.classId).name;
+    sub = `${n} questions across ${topicIds.length} topic${topicIds.length === 1 ? "" : "s"} you picked.`;
   }
+  R.quiz = { ctx, qs: buildQuiz(topicIds, n), i: 0, ans: [], done: false, title, sub };
+  R.modal = null; R.view = "check"; render();
+}
 
-  if (!R.quiz) R.quiz = { qs: buildQuiz(topicIds, isTopic ? 6 : 15), i: 0, ans: [], done: false };
+function screenCheck() {
   const Q = R.quiz;
-
-  if (Q.done) return quizResults(Q, x, e, backTo, isTopic);
-
+  if (!Q) { R.view = "home"; return screenHome(); }
+  if (Q.done) return quizResults(Q);
   const q = Q.qs[Q.i], picked = Q.ans[Q.i];
   return `<div class="main" style="max-width:800px">
-    <div class="crumb"><a onclick="R.quiz=null;${backTo}">← Back</a></div>
-    <h1>${esc(title)}</h1>
-    <div class="sub" style="margin-top:4px">${esc(sub)}</div>
-    ${!isTopic ? note(`<b>Question sourcing, option 3.</b> Pooled from the same banks the student already worked through inside these topics, so some will repeat. The copy has to say that out loud or the score over-reports readiness. Reserved holdout sets or Rubi Practice generation are the two real fixes; both are dependencies you do not control yet.`) : ""}
+    <button class="backbtn" onclick="saveExit()">← Save and exit</button>
+    <h1>${esc(Q.title)}</h1>
+    <div class="sub" style="margin-top:4px">${esc(Q.sub)}</div>
     <div class="card" style="margin-top:16px">
-      <div class="btw mb"><div class="eb">Question ${Q.i + 1} of ${Q.qs.length}</div><div class="sm">${esc(ALLTOPICS[q.tid].n)}</div></div>
+      <div class="btw mb"><div class="eb">Question ${Q.i + 1} of ${Q.qs.length}</div>
+        <div class="sm">${esc(ALLTOPICS[q.tid].n)}${q.fresh ? "" : " · seen before"}</div></div>
       <div class="bar mb"><i style="width:${(Q.i + 1) / Q.qs.length * 100}%"></i></div>
-      <div style="font-size:16.5px;font-weight:600;margin:14px 0 14px">${esc(q.q)}</div>
+      <div style="font-size:16.5px;font-weight:600;margin:14px 0">${esc(q.q)}</div>
       ${q.opts.map((o, i) => `<div class="qopt ${picked === i ? "sel" : ""}" onclick="pick(${i})"><span class="l">${"ABCD"[i]}</span><span>${esc(o)}</span></div>`).join("")}
       <div class="mfoot">
-        <button class="btn bt" style="margin-right:auto" onclick="saveExit()">Save and exit</button>
         ${Q.i > 0 ? `<button class="btn bg" onclick="R.quiz.i--;render()">Back</button>` : ""}
         <button class="btn bp" ${picked === undefined ? "disabled" : ""} onclick="nextQ()">${Q.i === Q.qs.length - 1 ? "Finish" : "Next"}</button>
       </div>
@@ -1076,95 +1205,101 @@ function screenCheck() {
   </div>`;
 }
 
-function quizResults(Q, x, e, backTo, isTopic) {
+function quizResults(Q) {
   const per = {};
-  Q.qs.forEach((q, i) => {
-    per[q.tid] = per[q.tid] || { c: 0, t: 0 };
-    per[q.tid].t++; if (Q.ans[i] === q.a) per[q.tid].c++;
-  });
+  Q.qs.forEach((q, i) => { per[q.tid] = per[q.tid] || { c: 0, t: 0 }; per[q.tid].t++; if (Q.ans[i] === q.a) per[q.tid].c++; });
   const correct = Q.qs.filter((q, i) => Q.ans[i] === q.a).length;
   const score = Math.round(correct / Q.qs.length * 100);
-  const band = score >= 75 ? "ok" : score >= 60 ? "mid" : "low";
-  const label = score >= 75 ? "On track" : score >= 60 ? "Almost there" : "Keep studying";
+  const fresh = Q.qs.filter(q => q.fresh).length;
+  const isReady = Q.ctx.kind === "readiness";
+  const ready = score >= READY_BAR;
 
   if (!Q.saved) {
     Q.saved = true;
-    if (isTopic) { e.quiz = true; e.quizScore = score; e.quizAnswered = Q.qs.length; e.quizCorrect = correct;
-      logIt(e.classId, e.topicId, `Quiz: ${topicOf(e).n} — ${score}%`, "today"); }
-    else { x.checkpoint = { correct, total: Q.qs.length, score, takenOn: "today", perTopic: per };
-      logIt(x.classId, null, `Readiness check: ${x.name} — ${score}%`, "today"); }
+    Q.qs.forEach((q, i) => recordAnswer(q.tid, Q.ans[i] === q.a, q.key));
+    if (Q.ctx.kind === "topic") {
+      const e = enrById(Q.ctx.enrollId); e.quiz = true;
+      logIt(e.classId, e.topicId, `Quiz: ${topicOf(e).n} — ${score}%`, "today");
+    } else if (isReady) {
+      const x = S.exams.find(z => z.id === Q.ctx.examId);
+      x.attempts.push({ score, correct, total: Q.qs.length, fresh, takenOn: "today", perTopic: per });
+      Object.keys(per).forEach(tid => { const e = S.enroll.find(z => z.classId === x.classId && z.topicId === tid); if (e) e.quiz = true; });
+      logIt(x.classId, null, `Readiness quiz: ${x.name} — ${score}%`, "today");
+    } else {
+      logIt(Q.ctx.classId, null, `Class quiz — ${score}%`, "today");
+      Object.keys(per).forEach(tid => { const e = S.enroll.find(z => z.classId === Q.ctx.classId && z.topicId === tid); if (e) e.quiz = true; });
+    }
   }
 
+  const back = Q.ctx.kind === "topic" ? `go('topic',{enrollId:'${Q.ctx.enrollId}'})`
+    : `go('class',{classId:'${isReady ? S.exams.find(z => z.id === Q.ctx.examId).classId : Q.ctx.classId}'})`;
+
   return `<div class="main" style="max-width:800px">
-    <div class="crumb"><a onclick="R.quiz=null;${backTo}">← Back</a></div>
-    <div class="band ${band}">
-      <div class="eb" style="color:inherit;opacity:.7">${isTopic ? "Topic quiz" : "Readiness check"}</div>
-      <h2 style="margin-top:4px">${label} — ${score}%</h2>
-      <div class="sm" style="margin-top:4px">${correct} of ${Q.qs.length} correct.${isTopic ? "" : " This is a review check on questions from your topics, not a prediction of your exam score."}</div>
+    <button class="backbtn" onclick="R.quiz=null;${back}">← Back</button>
+    <div class="band ${isReady ? (ready ? "ok" : "low") : score >= READY_BAR ? "ok" : "low"}">
+      <div class="eb" style="color:inherit;opacity:.7">${isReady ? "Readiness quiz" : "Quiz result"}</div>
+      <h2 style="margin-top:4px">${isReady ? (ready ? "You're ready" : "Not ready yet") : score + "%"} ${isReady ? "— " + score + "%" : ""}</h2>
+      <div class="sm" style="margin-top:4px">${correct} of ${Q.qs.length} correct.${isReady ? ` ${READY_BAR}% is the bar.` : ""}${fresh < Q.qs.length ? ` ${fresh} were new to you; the rest you've seen before.` : " Every question was new to you."}</div>
     </div>
-    ${!isTopic ? `
-      <div class="card">
-        <div class="chead"><div><h2>Where you're weakest</h2><div class="sub">Ranked across this exam's topics.</div></div></div>
-        ${Object.entries(per).map(([tid, v]) => ({ tid, ...v, pc: Math.round(v.c / v.t * 100) })).sort((a, b) => a.pc - b.pc).map(r =>
-          r.t < 5
-          ? `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="sm" style="flex:1">Only ${r.t} questions answered. Not enough to rank yet.</div></div>`
-          : `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="bar p"><i style="width:${r.pc}%"></i></div>
-             <span class="scpill ${r.pc >= 75 ? "ok" : ""}">${r.pc}%</span><span class="sm" style="width:110px">${r.c} of ${r.t}</span>
-             <button class="btn bo s" onclick="R.quiz=null;remediate('${x.id}','${r.tid}')">Restudy topic</button></div>`).join("")}
-        ${note(`Five-question floor enforced. This check is 15 questions, so three topics land at exactly five each. Add a fourth topic and every one of them drops under the floor and becomes unrankable. That is a hard constraint on the readiness check length, and it is the strongest argument for a deeper bank or generated questions.`)}
-      </div>` : ""}
+
+    ${Object.keys(per).length > 1 ? `<div class="card">
+      <div class="chead"><div><h2>By topic</h2><div class="sub">Where to put your time.</div></div></div>
+      ${Object.entries(per).map(([tid, v]) => ({ tid, ...v, pc: Math.round(v.c / v.t * 100) })).sort((a, b) => a.pc - b.pc).map(r =>
+        r.t < MIN_PER_TOPIC
+        ? `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="sm" style="flex:1">Only ${r.t} question${r.t === 1 ? "" : "s"} here. Not enough to rank.</div></div>`
+        : `<div class="wkrow"><div class="nm">${esc(ALLTOPICS[r.tid].n)}</div><div class="bar ${r.pc >= READY_BAR ? "g" : "p"}"><i style="width:${r.pc}%"></i></div>
+           <span class="scpill ${r.pc >= READY_BAR ? "ok" : ""}">${r.pc}%</span><span class="sm" style="width:96px">${r.c} of ${r.t}</span>
+           ${isReady ? `<button class="btn bo s" onclick="R.quiz=null;restudy('${Q.ctx.examId}','${r.tid}')">Restudy</button>` : ""}</div>`).join("")}
+    </div>` : ""}
+
     <div class="card">
-      <div class="chead"><div><h2>Review your answers</h2><div class="sub">Every question, with the right answer and why.</div></div></div>
+      <div class="chead"><div><h2>Review your answers</h2><div class="sub">Every question, with the right answer.</div></div></div>
       ${Q.qs.map((q, i) => {
         const right = Q.ans[i] === q.a;
         return `<div class="lrow" style="align-items:flex-start">
           <div class="ico" style="background:${right ? "var(--grn100)" : "#fdeaea"};color:${right ? "var(--grn700)" : "var(--err)"}">${right ? "✓" : "✕"}</div>
           <div class="gr"><div class="t" style="white-space:normal">${esc(q.q)}</div>
-            <div class="m">${esc(ALLTOPICS[q.tid].n)} · ${right ? "you got this right" : `you picked ${"ABCD"[Q.ans[i]]} · correct answer is ${"ABCD"[q.a]}, ${esc(q.opts[q.a])}`}</div></div>
+            <div class="m">${esc(ALLTOPICS[q.tid].n)} · ${right ? "correct" : `you picked ${"ABCD"[Q.ans[i]]} · answer is ${"ABCD"[q.a]}, ${esc(q.opts[q.a])}`}</div></div>
           ${right ? "" : `<button class="btn bo s" onclick="toast('Rationale + the video moment that explains it')">See insights</button>`}
         </div>`;
       }).join("")}
     </div>
-    <div class="row"><button class="btn bo" onclick="R.quiz=null;${backTo}">Back to ${isTopic ? "topic" : "class"}</button>
-      <button class="btn bg" onclick="R.quiz=null;render()">Retake</button></div>
+    <div class="row"><button class="btn bo" onclick="R.quiz=null;${back}">Done</button>
+      <button class="btn bg" onclick="startQuiz(R.quiz.ctx)">Retake with new questions</button></div>
   </div>`;
 }
 
 function pick(i) { R.quiz.ans[R.quiz.i] = i; render(); }
-function saveExit() {
-  const isTopic = String(R.examId).startsWith("topic:");
-  R.quiz = null;
-  toast("Saved. Pick it up where you left off.");
-  if (isTopic) go("topic", { enrollId: R.examId.split(":")[1] });
-  else { const x = S.exams.find(z => z.id === R.examId); go("class", { classId: x.classId }); }
-}
-function doStep(id, k) {
-  const e = enrById(id), tp = topicOf(e);
-  if (!e[k]) {
-    e[k] = true;
-    logIt(e.classId, e.topicId, `${k === "watch" ? "Watched " + tp.v : "Opened the " + tp.n + " guide"}`, "today");
-    toast(k === "watch" ? "Video finished. Marked done." : "Guide read. Marked done.");
-  } else {
-    toast(k === "watch" ? "Playing " + tp.v : "Opening the guide");
-  }
-  render();
-}
-function confirmEarlyCheck(xid) {
-  R.confirm = {
-    title: "You haven't finished all your topics yet",
-    body: "The readiness check mixes questions from every topic on this exam, so your score will look worse than it should if some are untouched. Take it anyway?",
-    yes: "Take it anyway", fn: `go('check',{examId:'${xid}'})`
-  };
-  render();
-}
 function nextQ() { if (R.quiz.i === R.quiz.qs.length - 1) R.quiz.done = true; else R.quiz.i++; render(); }
+function saveExit() {
+  const ctx = R.quiz.ctx; R.quiz = null;
+  toast("Saved. Pick it up where you left off.");
+  if (ctx.kind === "topic") go("topic", { enrollId: ctx.enrollId });
+  else if (ctx.kind === "readiness") go("class", { classId: S.exams.find(z => z.id === ctx.examId).classId });
+  else go("class", { classId: ctx.classId });
+}
 
 /* ============================================================
    ACTIONS
    ============================================================ */
-function quickAdd(cid, tid) {
-  if (S.enroll.some(e => e.classId === cid && e.topicId === tid)) return toast("Already in this class");
-  enroll(cid, tid, { added: "today" }); toast("Added " + ALLTOPICS[tid].n); render();
+function doStep(id, k) {
+  const e = enrById(id), tp = topicOf(e);
+  if (!e[k]) {
+    e[k] = true;
+    logIt(e.classId, e.topicId, k === "watch" ? "Watched " + tp.v : "Opened the " + tp.n + " guide", "today");
+    toast(k === "watch" ? "Video finished. Marked done." : "Guide read. Marked done.");
+  } else toast(k === "watch" ? "Playing " + tp.v : "Opening the guide");
+  render();
+}
+function addAllCat(cid) {
+  const c = cls(cid); let n = 0;
+  catTopics(c.cat).forEach(t => { if (!S.enroll.some(e => e.classId === cid && e.topicId === t.id)) { enroll(cid, t.id, { added: "today" }); n++; } });
+  toast(`Added ${n} topic${n === 1 ? "" : "s"}`); render();
+}
+function addUnit(cid, uid2) {
+  const u = ALLUNITS[uid2]; let n = 0;
+  u.topics.forEach(t => { if (!S.enroll.some(e => e.classId === cid && e.topicId === t.id)) { enroll(cid, t.id, { added: "today" }); n++; } });
+  toast(`Added ${n} ${u.n} topic${n === 1 ? "" : "s"}`); render();
 }
 function removeEnroll(id) {
   const e = enrById(id), cid = e.classId;
@@ -1173,14 +1308,16 @@ function removeEnroll(id) {
   go("class", { classId: cid });
 }
 function setCat(cid, cat) { cls(cid).cat = cat; render(); }
-function remediate(xid, tid) {
+function setQCount(xid, n) { S.exams.find(z => z.id === xid).qcount = parseInt(n); render(); }
+function restudy(xid, tid) {
   const x = S.exams.find(z => z.id === xid);
   const e = S.enroll.find(z => z.classId === x.classId && z.topicId === tid);
-  if (e) { e.quiz = false; e.quizScore = null; }
-  logIt(x.classId, tid, `Redoing the ${ALLTOPICS[tid].n} quiz after the readiness check`, "today");
-  toast(ALLTOPICS[tid].n + " quiz reset. Your video and guide stay done.");
-  go("class", { classId: x.classId });
+  if (e) { e.quiz = false; R.enrollId = e.id; }
+  logIt(x.classId, tid, `Restudying ${ALLTOPICS[tid].n} after the readiness quiz`, "today");
+  if (e) go("topic", { enrollId: e.id }); else go("class", { classId: x.classId });
 }
+function scrollTopics() { const el = document.getElementById("topics"); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+function dismissRec(i) { S.dismissed.push(i); render(); }
 let toastT;
 function toast(msg) {
   let el = document.getElementById("toast");
@@ -1197,27 +1334,63 @@ function toast(msg) {
 function modalWrap(inner, w) { return `<div class="scrim" onclick="if(event.target===this)closeModal()"><div class="modal ${w ? "w" : ""}">${inner}</div></div>`; }
 const dstr = d => d ? new Date(d).toISOString().slice(0, 10) : "";
 
-/* ---------- category picker used in a few places ---------- */
-function catPicker(current, onpick) {
-  return `<div class="row" style="gap:7px;margin-top:8px">${CATS.map(x =>
-    `<button class="pillbtn ${current === x.id ? "sel" : ""}" onclick="${onpick}('${x.id}')">${esc(x.name)}</button>`).join("")}</div>`;
+/* Class > Unit > Topic browser */
+function topicBrowser(o) {
+  R.modal.primaryCat = o.primaryCat || null;
+  const q = (o.q || "").trim().toLowerCase();
+  const cats = o.primaryCat ? [CAT(o.primaryCat)].concat(CATS.filter(c => c.id !== o.primaryCat)) : CATS;
+  const body = cats.map(c => {
+    const units = c.units.map(u => ({ u, hits: u.topics.filter(t => !q || t.n.toLowerCase().includes(q) || u.n.toLowerCase().includes(q)) }))
+      .filter(z => z.hits.length);
+    if (!units.length) return "";
+    const catOpen = q ? true : (o.open["c:" + c.id] !== undefined ? o.open["c:" + c.id] : c.id === o.primaryCat);
+    const nsel = catTopics(c.id).filter(t => o.sel.includes(t.id)).length;
+    return `<div class="acc">
+      <div class="acchead" onclick="toggleAcc('c:${c.id}')">
+        <span class="caret">${catOpen ? "▾" : "▸"}</span><span class="accname">${esc(c.name)}</span>
+        <span class="sm">${c.units.length} units · ${catTopics(c.id).length} topics</span>
+        ${nsel ? `<span class="chip cl">${nsel} selected</span>` : ""}
+        ${(() => { const addable = catTopics(c.id).filter(t => !o.have.includes(t.id) && !o.sel.includes(t.id)).length;
+          return `<button class="btn bo s" onclick="event.stopPropagation();selCat('${c.id}','${o.onToggle}')" ${addable ? "" : "disabled"}>${addable ? "Add all " + addable : "All added"}</button>`; })()}
+      </div>
+      ${catOpen ? `<div class="accbody">${units.map(({ u, hits }) => {
+        const uOpen = q ? true : !!o.open["u:" + u.id];
+        const allIn = hits.every(t => o.have.includes(t.id) || o.sel.includes(t.id));
+        return `<div class="uacc">
+          <div class="uhead" onclick="toggleAcc('u:${u.id}')">
+            <span class="caret">${uOpen ? "▾" : "▸"}</span><span class="uname">${esc(u.n)}</span>
+            <span class="sm">${hits.length} topic${hits.length === 1 ? "" : "s"}${allIn ? " · all added" : ""}</span>
+          </div>
+          ${uOpen ? hits.map(t => o.have.includes(t.id)
+            ? `<div class="pick" style="opacity:.45;cursor:default"><div class="cbx">✓</div><div class="n">${esc(t.n)}</div><div class="sm">already added</div></div>`
+            : `<div class="pick ${o.sel.includes(t.id) ? "sel" : ""}" onclick="${o.onToggle}('${t.id}')">
+                <div class="cbx">${o.sel.includes(t.id) ? "✓" : ""}</div><div class="n">${esc(t.n)}</div></div>`).join("") : ""}
+        </div>`;
+      }).join("")}</div>` : ""}
+    </div>`;
+  }).join("");
+  return `<div class="searchwrap"><input class="searchin" placeholder="Search units and topics" value="${esc(o.q || "")}" oninput="R.modal.q=this.value;render()"></div>
+    <div class="picklist">${body || `<div class="sm" style="padding:14px">Nothing matches "${esc(o.q)}".</div>`}</div>`;
 }
+function toggleAcc(k) {
+  R.modal.open = R.modal.open || {};
+  const dflt = k.startsWith("c:") && k.slice(2) === R.modal.primaryCat;
+  R.modal.open[k] = !(R.modal.open[k] !== undefined ? R.modal.open[k] : dflt);
+  render();
+}
+function selCat(cid, fn) { catTopics(cid).forEach(t => window[fn](t.id, true)); render(); }
 
-/* ============================================================
-   ADD CLASS
-   ============================================================ */
 function modalAddClass() {
   const m = R.modal, d = m.d;
   if (m.step === 1) {
     if (d.name && d.cat === undefined) d.cat = guessCat(d.name);
     const auto = d.name ? guessCat(d.name) : null;
-        return modalWrap(`
+    return modalWrap(`
       <h2>Add a class</h2>
       <div class="sub">Name it the way your school does. That's all we need.</div>
       <div class="field"><label>Class name</label>
         <input id="f_name" value="${esc(d.name || "")}" placeholder="e.g. Med Surg I"
-          oninput="R.modal.d.name=this.value;R.modal.d.cat=guessCat(this.value);R.modal.d.picking=false;render()" autofocus></div>
-
+          oninput="R.modal.d.name=this.value;R.modal.d.cat=guessCat(this.value);render()" autofocus></div>
       ${d.name ? `<div class="field">
         <label>What areas does this class cover?</label>
         <div class="selectwrap"><select onchange="pickClassCat(this.value)">
@@ -1227,31 +1400,29 @@ function modalAddClass() {
         <div class="sm" style="margin-top:6px">${d.cat && auto === d.cat ? "Pre-filled from the class name. Change it if that's not right." : d.cat ? "" : "We couldn't tell from the name, so pick the closest area."}</div>
         ${d.cat ? areaBlurb(d.cat) : ""}
       </div>` : ""}
-
       <div class="row" style="gap:14px">
-        <div class="field" style="flex:1"><label>Instructor <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+        <div class="field" style="flex:1"><label>Instructor <span class="opt">— optional</span></label>
           <input value="${esc(d.instructor || "")}" oninput="R.modal.d.instructor=this.value" placeholder="Prof. Alvarez"></div>
-        <div class="field" style="flex:1"><label>Class ends <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+        <div class="field" style="flex:1"><label>Class ends <span class="opt">— optional</span></label>
           <input type="date" value="${dstr(d.ends)}" onchange="R.modal.d.ends=this.value?new Date(this.value+'T12:00:00'):null"></div>
       </div>
-
       <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
         <button class="btn bp" ${d.name && d.cat ? "" : "disabled"} onclick="R.modal.step=2;render()">Continue</button></div>`);
   }
-
   const sel = d.sel || [];
   R.modal.open = R.modal.open || {};
   return modalWrap(`
     <h2>Which topics do you need?</h2>
-    <div class="sub">Pick the ones on your syllabus. Each gives you a video, a study guide and a quiz, tracked inside ${esc(d.name)}. You can skip this and add them later.</div>
+    <div class="sub">Open a unit and pick, or add a whole unit at once. You can skip this and add them later.</div>
     ${topicBrowser({ sel, have: [], q: R.modal.q, open: R.modal.open, onToggle: "togSel", primaryCat: d.cat })}
     <div class="mfoot"><button class="btn bg" onclick="R.modal.step=1;R.modal.q='';render()">Back</button>
       <button class="btn bo" onclick="createClass(false)">Create without topics</button>
       <button class="btn bp" ${sel.length ? "" : "disabled"} onclick="createClass(true)">Add ${sel.length || ""} topic${sel.length === 1 ? "" : "s"}</button></div>`, true);
 }
-function pickClassCat(id) { R.modal.d.cat = id; R.modal.d.picking = false; render(); }
-function togSel(tid) {
+function pickClassCat(id) { R.modal.d.cat = id; render(); }
+function togSel(tid, quiet) {
   const d = R.modal.d; d.sel = d.sel || [];
+  if (quiet) { if (!d.sel.includes(tid)) d.sel.push(tid); return; }
   d.sel = d.sel.includes(tid) ? d.sel.filter(x => x !== tid) : d.sel.concat(tid);
   render();
 }
@@ -1262,62 +1433,20 @@ function createClass(withTopics) {
   go("class", { classId: c.id });
 }
 
-/* ============================================================
-   TOPIC BROWSER — shared by Add topics and Add exam
-   ============================================================ */
-function topicBrowser(o) {
-  // o: {sel[], have[], q, open{}, onToggle, primaryCat}
-  R.modal.primaryCat = o.primaryCat || null;
-  const q = (o.q || "").trim().toLowerCase();
-  const cats = o.primaryCat ? [CAT(o.primaryCat)].concat(CATS.filter(c => c.id !== o.primaryCat)) : CATS;
-  const body = cats.map(c => {
-    const hits = c.topics.filter(t => !q || t.n.toLowerCase().includes(q) || t.v.toLowerCase().includes(q));
-    if (!hits.length) return "";
-    const open = q ? true : (o.open[c.id] !== undefined ? o.open[c.id] : c.id === o.primaryCat);
-    const nsel = c.topics.filter(t => o.sel.includes(t.id)).length;
-    return `<div class="acc">
-      <div class="acchead" onclick="toggleAcc('${c.id}')">
-        <span class="caret">${open ? "▾" : "▸"}</span>
-        <span class="accname">${esc(c.name)}</span>
-        <span class="sm">${hits.length} topic${hits.length === 1 ? "" : "s"}</span>
-        ${nsel ? `<span class="chip cl">${nsel} selected</span>` : ""}
-      </div>
-      ${open ? `<div class="accbody">${hits.map(t => {
-        const has = o.have.includes(t.id);
-        return has
-          ? `<div class="pick" style="opacity:.45;cursor:default"><div class="cbx">✓</div><div class="n">${esc(t.n)}</div><div class="sm">already added</div></div>`
-          : `<div class="pick ${o.sel.includes(t.id) ? "sel" : ""}" onclick="${o.onToggle}('${t.id}')">
-             <div class="cbx">${o.sel.includes(t.id) ? "✓" : ""}</div>
-             <div class="n">${esc(t.n)}</div>
-             </div>`;
-      }).join("")}</div>` : ""}
-    </div>`;
-  }).join("");
-  return `<div class="searchwrap"><input class="searchin" placeholder="Search topics" value="${esc(o.q || "")}" oninput="R.modal.q=this.value;render()"></div>
-    <div class="picklist">${body || `<div class="sm" style="padding:14px">No topics match "${esc(o.q)}".</div>`}</div>`;
-}
-function toggleAcc(cid) {
-  R.modal.open = R.modal.open || {};
-  const cur = R.modal.open[cid] !== undefined ? R.modal.open[cid] : cid === R.modal.primaryCat;
-  R.modal.open[cid] = !cur; render();
-}
-
-/* ============================================================
-   ADD TOPICS
-   ============================================================ */
 function modalAddTopics() {
   const c = cls(R.classId);
   const sel = R.modal.sel || [], have = enrollsOf(c.id).map(e => e.topicId);
   R.modal.open = R.modal.open || {};
   return modalWrap(`
     <h2>Add topics to ${esc(c.name)}</h2>
-    <div class="sub">Your class's category is open first. A class isn't limited to one category.</div>
+    <div class="sub">Your class's area opens first. You can pull topics from any area.</div>
     ${topicBrowser({ sel, have, q: R.modal.q, open: R.modal.open, onToggle: "togAdd", primaryCat: c.cat })}
     <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
       <button class="btn bp" ${sel.length ? "" : "disabled"} onclick="doAddTopics()">Add ${sel.length || ""}</button></div>`, true);
 }
-function togAdd(tid) {
+function togAdd(tid, quiet) {
   R.modal.sel = R.modal.sel || [];
+  if (quiet) { if (!R.modal.sel.includes(tid)) R.modal.sel.push(tid); return; }
   R.modal.sel = R.modal.sel.includes(tid) ? R.modal.sel.filter(x => x !== tid) : R.modal.sel.concat(tid);
   render();
 }
@@ -1326,37 +1455,46 @@ function doAddTopics() {
   toast(R.modal.sel.length + " topic" + (R.modal.sel.length === 1 ? "" : "s") + " added"); closeModal();
 }
 
-/* ============================================================
-   ADD EXAM
-   ============================================================ */
 function modalAddExam() {
   const c = cls(R.classId), d = R.modal.d, es = enrollsOf(c.id);
   const ids = d.ids || [], lib = d.lib || [];
   R.modal.open = R.modal.open || {};
   const total = ids.length + lib.length;
   const mode = R.modal.mode || "class";
+  const per = total ? Math.floor((d.qcount || 20) / total) : 0;
 
   return modalWrap(`
     <h2>${d.id ? "Edit exam" : "Add an exam"}</h2>
-    <div class="sub">${esc(c.name)} · an exam groups the topics it covers and unlocks the readiness check.</div>
+    <div class="sub">${esc(c.name)} · we use this to build your readiness quiz. It doesn't change how you study your topics.</div>
     <div class="row" style="gap:14px">
       <div class="field" style="flex:1"><label>Exam name</label><input value="${esc(d.name || "")}" oninput="R.modal.d.name=this.value" placeholder="Exam 2" autofocus></div>
       <div class="field" style="flex:1"><label>Date</label><input type="date" value="${dstr(d.date)}" onchange="R.modal.d.date=this.value?new Date(this.value+'T12:00:00'):null;render()"></div>
     </div>
 
-    <div class="field"><label>Topics on this exam ${total ? `<span style="color:var(--blue)">· ${total} selected</span>` : ""}</label></div>
+    <div class="field"><label>What's on it? ${total ? `<span style="color:var(--blue)">· ${total} selected</span>` : ""}</label></div>
     <div class="ptabs" style="border-bottom:1px solid var(--bd);padding:0;margin-bottom:10px">
       <div class="${mode === "class" ? "on" : ""}" onclick="R.modal.mode='class';render()">IN THIS CLASS ${es.length}</div>
       <div class="${mode === "lib" ? "on" : ""}" onclick="R.modal.mode='lib';render()">ADD FROM LIBRARY${lib.length ? " " + lib.length : ""}</div>
     </div>
-
     ${mode === "class"
-      ? (es.length ? `<div class="picklist" style="max-height:260px">${es.map(e => `<div class="pick ${ids.includes(e.topicId) ? "sel" : ""}" onclick="togExam('${e.topicId}')">
+      ? (es.length ? `<div class="picklist" style="max-height:230px">${es.map(e => `<div class="pick ${ids.includes(e.topicId) ? "sel" : ""}" onclick="togExam('${e.topicId}')">
           <div class="cbx">${ids.includes(e.topicId) ? "✓" : ""}</div><div class="n">${esc(topicOf(e).n)}</div>
-          <div class="sm">${stepsDone(e)}/3 done</div></div>`).join("")}</div>`
+          <div class="sm">${esc(topicOf(e).unitName)}</div></div>`).join("")}</div>`
         : `<div class="sm" style="padding:12px 0">No topics in this class yet. Add some from the library tab.</div>`)
-      : `<div class="sm" style="margin-bottom:6px">Anything you pick here gets added to ${esc(c.name)} as well.</div>
+      : `<div class="sm" style="margin-bottom:6px">Anything you pick here gets added to ${esc(c.name)} too.</div>
          ${topicBrowser({ sel: lib, have: es.map(e => e.topicId), q: R.modal.q, open: R.modal.open, onToggle: "togExamLib", primaryCat: c.cat })}`}
+
+    <div class="field"><label>Readiness quiz length</label>
+      <div class="row" style="gap:8px;align-items:center">
+        <div class="selectwrap" style="width:110px"><select onchange="R.modal.d.qcount=parseInt(this.value);render()">
+          ${[5,10,15,20,25,30,40].map(n => `<option value="${n}" ${(d.qcount || 20) === n ? "selected" : ""}>${n}</option>`).join("")}
+        </select></div>
+        <div class="sm ${total && per < MIN_PER_TOPIC ? "warn" : "ok"}" style="flex:1">${total
+          ? (per >= MIN_PER_TOPIC
+            ? `About ${per} questions per topic. Enough to rank your weak spots.`
+            : `Only ${per} per topic. We need ${MIN_PER_TOPIC} to rank weak spots — try ${MIN_PER_TOPIC * total}.`)
+          : "Pick your topics first."}</div>
+      </div></div>
 
     <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
       <button class="btn bp" ${d.name && d.date && total ? "" : "disabled"} onclick="saveExam()">${d.id ? "Save" : "Add exam"}</button></div>`, true);
@@ -1366,8 +1504,9 @@ function togExam(tid) {
   d.ids = d.ids.includes(tid) ? d.ids.filter(x => x !== tid) : d.ids.concat(tid);
   render();
 }
-function togExamLib(tid) {
+function togExamLib(tid, quiet) {
   const d = R.modal.d; d.lib = d.lib || [];
+  if (quiet) { if (!d.lib.includes(tid)) d.lib.push(tid); return; }
   d.lib = d.lib.includes(tid) ? d.lib.filter(x => x !== tid) : d.lib.concat(tid);
   render();
 }
@@ -1375,20 +1514,52 @@ function saveExam() {
   const d = R.modal.d;
   (d.lib || []).forEach(t => { if (!S.enroll.some(e => e.classId === R.classId && e.topicId === t)) enroll(R.classId, t, { added: "today" }); });
   const all = (d.ids || []).concat(d.lib || []);
-  if (d.id) { const x = S.exams.find(z => z.id === d.id); x.name = d.name; x.date = d.date; x.topicIds = all; }
-  else addExam(R.classId, d.name, d.date, all);
+  if (d.id) { const x = S.exams.find(z => z.id === d.id); x.name = d.name; x.date = d.date; x.topicIds = all; x.qcount = d.qcount || 20; }
+  else addExam(R.classId, d.name, d.date, all, { qcount: d.qcount || 20 });
   closeModal();
 }
 
-/* ============================================================
-   EXAM RESULT
-   ============================================================ */
+function modalClassQuiz() {
+  const c = cls(R.classId), es = enrollsOf(c.id);
+  const sel = R.modal.sel || [], n = R.modal.n || 20;
+  const per = sel.length ? Math.floor(n / sel.length) : 0;
+  return modalWrap(`
+    <h2>Build a quiz</h2>
+    <div class="sub">Pick any topics from ${esc(c.name)}. Your score counts toward those topics wherever you see them.</div>
+    <div class="btw" style="margin-top:12px">
+      <div class="sm">${sel.length} of ${es.length} selected</div>
+      <button class="btn bt s" onclick="selAllQuiz()">${sel.length === es.length ? "Clear all" : "Select all"}</button>
+    </div>
+    <div class="picklist" style="max-height:250px">${es.map(e => `<div class="pick ${sel.includes(e.topicId) ? "sel" : ""}" onclick="togQuiz('${e.topicId}')">
+      <div class="cbx">${sel.includes(e.topicId) ? "✓" : ""}</div><div class="n">${esc(topicOf(e).n)}</div>
+      <div class="sm">${masteryPct(e.topicId) === null ? "not quizzed yet" : masteryPct(e.topicId) + "%"}</div></div>`).join("")}</div>
+    <div class="field"><label>How many questions?</label>
+      <div class="row" style="gap:8px;align-items:center">
+        <div class="selectwrap" style="width:110px"><select onchange="R.modal.n=parseInt(this.value);render()">
+          ${[5,10,15,20,25,30,40].map(x => `<option value="${x}" ${n === x ? "selected" : ""}>${x}</option>`).join("")}
+        </select></div>
+        <div class="sm" style="flex:1">${sel.length ? `About ${per} per topic, mixed together.` : "Pick your topics first."}</div>
+      </div></div>
+    <div class="mfoot"><button class="btn bg" onclick="closeModal()">Cancel</button>
+      <button class="btn bp" ${sel.length ? "" : "disabled"} onclick="startQuiz({kind:'class',classId:'${c.id}',topicIds:${JSON.stringify(sel)},n:${n}})">Start quiz</button></div>`);
+}
+function togQuiz(tid) {
+  R.modal.sel = R.modal.sel || [];
+  R.modal.sel = R.modal.sel.includes(tid) ? R.modal.sel.filter(x => x !== tid) : R.modal.sel.concat(tid);
+  render();
+}
+function selAllQuiz() {
+  const es = enrollsOf(R.classId).map(e => e.topicId);
+  R.modal.sel = (R.modal.sel || []).length === es.length ? [] : es;
+  render();
+}
+
 function modalResult() {
-  const x = S.exams.find(z => z.id === R.modal.examId);
+  const x = S.exams.find(z => z.id === R.modal.examId), a = lastAttempt(x);
   return modalWrap(`
     <div class="eb">${esc(cls(x.classId).name)} · ${esc(x.name)}</div>
     <h2 style="margin-top:5px">How did it go?</h2>
-    <div class="sub">Add your result to close out this exam. You'll be able to set up your next one straight after.</div>
+    <div class="sub">${a ? `You scored ${a.score}% on your readiness quiz. Tell us how the real thing went and we'll show you both side by side.` : "Add your result to close this exam out and set up your next one."}</div>
     <div class="field"><label>Outcome</label>
       <div class="row" style="gap:8px">${["Passed", "Failed", "Rather not say"].map(o => `<button class="btn ${R.modal.out === o ? "bb" : "bg"}" onclick="R.modal.out='${o}';render()">${o}</button>`).join("")}</div></div>
     <div class="field"><label>Score, if you know it (optional)</label><input placeholder="88" oninput="R.modal.grade=this.value"></div>
@@ -1402,23 +1573,20 @@ function saveResult() {
   toast("Result saved. You can add your next exam."); closeModal();
 }
 
-/* ============================================================
-   EDIT CLASS
-   ============================================================ */
 function modalEditClass() {
   const c = cls(R.classId), d = R.modal.d;
   return modalWrap(`
     <h2>Edit class</h2>
     <div class="field"><label>Class name</label><input value="${esc(d.name)}" oninput="R.modal.d.name=this.value"></div>
     <div class="field"><label>Areas this class covers</label>
-<div class="selectwrap"><select onchange="editCat(this.value)">
-<option value="">None</option>
-${CATS.map(x => `<option value="${x.id}" ${d.cat === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}
-</select></div>${d.cat ? areaBlurb(d.cat) : ""}</div>
+      <div class="selectwrap"><select onchange="editCat(this.value)">
+        <option value="">None</option>
+        ${CATS.map(x => `<option value="${x.id}" ${d.cat === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}
+      </select></div>${d.cat ? areaBlurb(d.cat) : ""}</div>
     <div class="row" style="gap:14px">
-      <div class="field" style="flex:1"><label>Instructor <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+      <div class="field" style="flex:1"><label>Instructor <span class="opt">— optional</span></label>
         <input value="${esc(d.instructor || "")}" oninput="R.modal.d.instructor=this.value"></div>
-      <div class="field" style="flex:1"><label>Class ends <span style="text-transform:none;font-weight:400;color:var(--muted)">— optional</span></label>
+      <div class="field" style="flex:1"><label>Class ends <span class="opt">— optional</span></label>
         <input type="date" value="${dstr(d.ends)}" onchange="R.modal.d.ends=this.value?new Date(this.value+'T12:00:00'):null"></div>
     </div>
     <div class="mfoot">
@@ -1434,9 +1602,6 @@ function saveClass() {
 }
 function archiveClass(id) { const c = cls(id); c.archived = !c.archived; R.modal = null; go("classes"); }
 
-/* ============================================================
-   ADD ITEM
-   ============================================================ */
 function modalAddItem() {
   const c = cls(R.classId), cat = c.cat ? CAT(c.cat) : null;
   const orph = ORPHANS.filter(o => !cat || o.cat === cat.id);
@@ -1445,14 +1610,14 @@ function modalAddItem() {
     <div class="sub">Save a video or guide to ${esc(c.name)} so you can find it again.</div>
     <div class="picklist" style="max-height:260px">
       ${orph.map(o => `<div class="pick" onclick="pinItem('${o.id}')"><div class="cbx"></div><div class="n">${esc(o.t)}</div><div class="sm">Video · ${esc(o.d)}</div></div>`).join("")}
-      ${orph.length ? "" : `<div class="sm">No unattached content in this category.</div>`}
+      ${orph.length ? "" : `<div class="sm">Nothing available in this area.</div>`}
     </div>
     <div class="mfoot"><button class="btn bg" onclick="closeModal()">Done</button></div>`);
 }
 function pinItem(oid) {
   const o = ORPHANS.find(x => x.id === oid);
-  addItem(R.classId, "video", o.t, { dur: o.d, th: o.th, src: "orphan" });
-  toast("Pinned to class"); closeModal();
+  addItem(R.classId, "video", o.t, { dur: o.d, th: o.th });
+  toast("Saved to this class"); closeModal();
 }
 
 /* ============================================================
@@ -1473,7 +1638,7 @@ function sidebar() {
     <div class="nsec">PRACTICE</div>
     ${["Course Question Bank", "NCLEX Question Bank"].map(x => `<div class="nit" onclick="toast('${esc(x)}')"><span class="ic">▤</span> ${esc(x)}</div>`).join("")}
     <div class="ndiv"></div>
-    <div class="nit" onclick="toast('My collections')"><span class="ic">≡</span> My collections </div>
+    <div class="nit" onclick="toast('My collections')"><span class="ic">≡</span> My collections</div>
   </div>`;
 }
 
@@ -1486,22 +1651,16 @@ function devbar() {
   return `${DEV ? `<div class="panel">
       <b>Test scenario</b>
       ${SCEN.map(([k, l]) => `<button class="${R.scenario === k ? "on" : ""}" onclick="scenario('${k}');render()">${l}</button>`).join("")}
-      <div class="foot">
-        <button onclick="advance()" style="margin-bottom:6px">Advance 10 days</button>
-        Today: ${S.now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-      </div>
+      <div class="foot"><button onclick="advance()" style="margin-bottom:6px">Advance 10 days</button>
+        Today: ${S.now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
     </div>` : ""}
     <button class="knob" title="Prototype controls" onclick="DEV=!DEV;render()">${DEV ? "&#10005;" : "&#9881;"}</button>`;
 }
 function advance() {
   S.now = new Date(S.now.getTime() + 10 * 864e5);
-  S.exams.forEach(x => { if (x.date < S.now) x.past = x.result ? true : x.past; });
   toast("Moved 10 days forward"); render();
 }
 
-/* ============================================================
-   RENDER
-   ============================================================ */
 function render() {
   let body = "";
   if (R.view === "home") body = screenHome();
@@ -1510,7 +1669,6 @@ function render() {
   else if (R.view === "topic") body = screenTopic();
   else if (R.view === "check") body = screenCheck();
 
-  document.body.classList.toggle("nonotes", !R.notes);
   $("#app").innerHTML = sidebar() + body + (R.menu ? `<div class="menuscrim" onclick="R.menu=null;render()"></div>` : "");
 
   let m = "";
@@ -1519,18 +1677,10 @@ function render() {
     if (t === "addclass") m = modalAddClass();
     if (t === "addtopics") m = modalAddTopics();
     if (t === "addexam") m = modalAddExam();
+    if (t === "classquiz") m = modalClassQuiz();
     if (t === "result") m = modalResult();
     if (t === "editclass") m = modalEditClass();
     if (t === "additem") m = modalAddItem();
-  }
-  if (R.confirm) {
-    const cf = R.confirm;
-    m = `<div class="scrim" onclick="if(event.target===this){R.confirm=null;render()}"><div class="modal" style="max-width:480px">
-      <h2>${esc(cf.title)}</h2>
-      <div class="sub" style="margin-top:8px">${esc(cf.body)}</div>
-      <div class="mfoot"><button class="btn bg" onclick="R.confirm=null;render()">Go back</button>
-      <button class="btn bp" onclick="R.confirm=null;${cf.fn}">${esc(cf.yes)}</button></div>
-    </div></div>`;
   }
   $("#modalroot").innerHTML = m;
   $("#devbar").innerHTML = devbar();
